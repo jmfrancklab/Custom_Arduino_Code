@@ -1,18 +1,22 @@
 #include <Arduino.h>
 #include <SPI.h>
 #include <SD.h>
-
+//Tried to define the pin select stuck here with initalizing the pin
+#define PIN_SPI_CS 4
 File myFile;
 
-// change this to match your SD shield or module;
-const int chipSelect = 10;
+// change this to match your SD shield or module; possilbe helpful link here https://arduinogetstarted.com/reference/library/arduino-sd.begin
+
+
 
 void setup()
 {
   // Open serial communications and wait for port to open:
   Serial.begin(9600);
-  
-
+  digitalWrite(10,HIGH);
+/*SD.begin();
+The stuff above did not change the initalization failed! check meanign the code is not connecting with the SD card
+*/ 
 
   Serial.print("Initializing SD card...");
 
