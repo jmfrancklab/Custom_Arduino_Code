@@ -1,28 +1,21 @@
-#include <Arduino.h>
 #include <SPI.h>
 #include <SD.h>
-//Tried to define the pin select stuck here with initalizing the pin
-#define PIN_SPI_CS 4
+
 File myFile;
 
-// change this to match your SD shield or module; possilbe helpful link here https://arduinogetstarted.com/reference/library/arduino-sd.begin
-
-
-
-void setup()
-{
+void setup() {
   // Open serial communications and wait for port to open:
   Serial.begin(9600);
-  digitalWrite(10,HIGH);
-/*SD.begin();
-The stuff above did not change the initalization failed! check meanign the code is not connecting with the SD card
-*/ 
+  while (!Serial) {
+    ; // wait for serial port to connect. Needed for native USB port only
+  }
+
 
   Serial.print("Initializing SD card...");
 
-  if (!SD.begin()) {
+  if (!SD.begin(4)) {
     Serial.println("initialization failed!");
-    return;
+    while (1);
   }
   Serial.println("initialization done.");
 
@@ -59,10 +52,6 @@ The stuff above did not change the initalization failed! check meanign the code 
   }
 }
 
-void loop()
-{
+void loop() {
   // nothing happens after setup
 }
-
-
-
