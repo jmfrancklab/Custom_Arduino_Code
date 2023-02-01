@@ -53,7 +53,7 @@ Serial.begin(9600);
 ODRecord = 0;
 numRead = 0;
 OD = 0;
-SD.open("System_State_Log.txt",FILE_WRITE);
+
 
 
 }
