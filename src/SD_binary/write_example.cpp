@@ -54,8 +54,8 @@ int main(void)
     //mydata without an array index is already a pointer, so what's up
     //with this?
     //size_t r1 = myFile.write((const uint8_t *)&mydata, sizeof(mydata));
-    printf("wrote %zu elements out of %d requested\n", r1,  datalen);
-    fclose(f1);
+    //printf("wrote %zu elements out of %d requested\n", r1,  datalen);
+    myFile.close();
     // }}}
 }
 
