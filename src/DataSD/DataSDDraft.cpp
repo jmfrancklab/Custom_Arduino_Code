@@ -19,16 +19,15 @@ int numReadTar =5 ;
 //Readings Counter
 int numRead;
 //File indentifier
-File file;
-/*
-For: https://forum.arduino.cc/t/sd-examples-and-chip-select-definition/126821/3
 
-The following notes were made:
+File myfile;
+//Will now make a structure which allows things to be written to a file
 
-For the Ethernet shield, pin 10 is chip select for the Ethernet controller
- and pin 4 is chip select for the SD card. So you should make pin 10 an output
-  and set it high to disable the Ethernet controller, not because pin 10 is SS.
-*/
+struct setlog {
+uint16_t Analog;
+/*Will set a time module but want to get this to work first*/
+};
+
 
 
 
@@ -45,7 +44,7 @@ pinMode(A0,INPUT);
 //pinMode(SS_PIN, OUTPUT); **
 //digitalWrite(SS_PIN, HIGH); **
 
-
+SD.open("System_State_Log.dat",FILE_WRITE);
 
 //Starting serial terminal 
 
@@ -75,10 +74,16 @@ ODRecord = ODRecord/numRead;
 Serial.print("Analog OD Value: ");
 Serial.println(ODRecord);
 //Recording OD Analog to Record
+
+//Setting structure element to ODRecord
+setlog logging;
+logging.Analog = ODRecord; 
+
+
 SD.begin(4);
-SD.open("System_State_Log.txt",FILE_WRITE);
-file.print(ODRecord);
-file.close();
+
+myfile.write(logging.Analog);
+myfile.close();
 
 //Resetting the Counters and the Recordering Variable
 
