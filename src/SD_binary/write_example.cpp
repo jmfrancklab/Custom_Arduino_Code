@@ -2,6 +2,7 @@
 #include <Arduino.h>
 #include <SPI.h>
 #include <SD.h>
+#define SD_CHIP_SELECT_PIN 4
 
 File myFile;
 
@@ -16,48 +17,43 @@ struct Datastore {
 
 void setup()
 {
-  // Open serial communications and wait for port to open:
-  Serial.begin(9600);
-  digitalWrite(10,HIGH);
-
-  Serial.print("Initializing SD card...");
-
-  if (!SD.begin()) {
-    Serial.println("initialization failed!");
-    return;
-  }
-  Serial.println("initialization done.");
-
-  // open the file. note that only one file can be open at a time,
-  // so you have to close this one before opening another.
-  myFile = SD.open("test.dat", FILE_WRITE);
-}
-
-int main(void)
-{
     int j;
     int datalen = 10;
+    int num_written;
+
+    // Open serial communications and wait for port to open:
+    Serial.begin(9600);
+    digitalWrite(10,HIGH);
+
+    Serial.print("Initializing SD card...");
+
+    if (!SD.begin(SD_CHIP_SELECT_PIN)) {//even though this argument is technically optional, we do need to select chip 4 for this to work!!
+        Serial.println("initialization failed!");
+        return;
+    }
+    Serial.println("initialization done.");
+
+    // open the file. note that only one file can be open at a time,
+    // so you have to close this one before opening another.
+    myFile = SD.open("test.dat", FILE_WRITE);
     Datastore mydata[datalen];
     for(j=0;j<datalen;j++){
         mydata[j].Voltage = j*10; // generate fake voltage data that's just 0, 10, 20... 90
         mydata[j].time = 1.0*j + 0.1; // generate fake time data that's 0.1, 1.1, 2.1, etc.
-        //printf("wrote %d %f\n",mydata[j].Voltage, mydata[j].time);
+                                      //printf("wrote %d %f\n",mydata[j].Voltage, mydata[j].time);
     }
-    // I do the following because I don't know offhand how many bytes of
-    // memory/filespace are needed to store each type.  this tells me
-    // I need this for numpy.
-    //printf("sizeof voltage %d time %d overall %d\n",sizeof mydata[0].Voltage,
-    //        sizeof mydata[0].time, sizeof mydata[0]);
     // {{{ in this block, the arduino commands will be similar, but somewhat different!
-    size_t r1 = myFile.write(mydata, sizeof(mydata));
-    //in the example, he does this, which doesn't seem right to me --
-    //mydata without an array index is already a pointer, so what's up
-    //with this?
-    //size_t r1 = myFile.write((const uint8_t *)&mydata, sizeof(mydata));
-    //printf("wrote %zu elements out of %d requested\n", r1,  datalen);
+    num_written = myFile.write((const uint8_t *)mydata, sizeof(mydata));
     myFile.close();
+    Serial.println("wrote data");
+    Serial.println("use this to det struct size");
+    Serial.println(sizeof(mydata));
+    Serial.println("this is how much I wrote");
+    Serial.println(num_written);
     // }}}
 }
+
+void loop(){}
 
 
 

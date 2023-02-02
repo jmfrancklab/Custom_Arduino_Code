@@ -14,16 +14,17 @@ mytype = dtype(
         # the numbers/sizes here are in bits -- these are taken from the
         # print sizeof command in the example
         [
-            ("voltage","u4"),
+            ("voltage","<u2"), # search "arduino unsigned int" for the size here
             # garbage accounts for the fact that the overall is not equal
             # to the sum of the parts as explained here:
             # https://stackoverflow.com/questions/32440081/why-is-the-sizeof-of-a-structure-larger-than-the-sum-of-its-parts
-            ("garbage","u4"),
-            ("time","f8"),
+            # ("garbage","<u2"),
+            # BUT arduino gives sizeof as 6, so there is no garbage 
+            ("time","<f4"), # search "arduino float size" for the size here
             ]
         )
-result = fromfile("file.bin", dtype=mytype)
-print(len(result))
+result = fromfile("TEST.DAT", dtype=mytype)
+print("length of result:",len(result))
 print(result["voltage"],result["time"])
 plot(result["time"], result["voltage"], "o-")
 show()
