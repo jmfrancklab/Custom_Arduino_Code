@@ -26,7 +26,7 @@ void setup() {
   // if the file opened okay, write to it:
   if (myFile) {
     Serial.print("Writing to test.txt...");
-    myFile.println("testing 1, 2, 3.");
+    myFile.println("testing 1, 2, 3, 4.");
     // close the file:
     myFile.close();
     Serial.println("done.");
