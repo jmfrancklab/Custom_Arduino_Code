@@ -15,9 +15,10 @@ struct Datastore {
 };
 
 File myFile;
-int loopcounter;
-
+int loopcounter;// I had thought about making this long, but if we do that, and do math with regular numbers, everything goes crazy!
+const int datalen = 10;
 const char *filename="test.dat";
+Datastore mydata[datalen];
 
 int data_written;
 unsigned long int start_time;
@@ -44,18 +45,16 @@ void setup()
     loopcounter = 0;
     start_time = millis();
     data_written = 0;
+    myFile = SD.open(filename, FILE_WRITE);
 }
 
 void loop()
 {
-    int datalen = 10;
-    Datastore mydata[datalen];// Datastore needs to be declared locally, not globally
     int j,k;
     int num_written;
     j = loopcounter % datalen;
     // open the file. note that only one file can be open at a time,
-    myFile = SD.open(filename, FILE_WRITE);// we can't do this in setup -- I tried! -- do it every time!
-    if(millis() - start_time < 200) // go for 2 secs -- in reality, could be replaced with button press, etc.
+    if(millis() - start_time < 3000) // go for 3 secs -- in reality, could be replaced with button press, etc.
     {
         mydata[j].Voltage = (loopcounter % 5) * 10; // generate fake voltage data that's just 0, 10, 20... 40 and cycles
         mydata[j].time = millis();
@@ -67,11 +66,11 @@ void loop()
         Serial.println(mydata[j].time);
         if (loopcounter>0 && j == datalen-1){// write data only once we've filled up mydata
             for(k=0;k<datalen;k++){
-              Serial.print("datapoint: ");
-              Serial.print(k); Serial.print(": ");
-              Serial.print(mydata[k].Voltage);
-              Serial.print(",");
-              Serial.println(mydata[k].time);
+                Serial.print("datapoint: ");
+                Serial.print(k); Serial.print(": ");
+                Serial.print(mydata[k].Voltage);
+                Serial.print(",");
+                Serial.println(mydata[k].time);
             }
             num_written = myFile.write((const uint8_t *)mydata, sizeof(mydata));
 
@@ -81,13 +80,13 @@ void loop()
     }else if(loopcounter>0 && !data_written){
         Serial.println("binary data done");
         data_written = 1;
+        myFile.close();
     }
-    
+
     loopcounter += 1;
     if(loopcounter>50000 && loopcounter % datalen == 0){
-      loopcounter=0;// prevent overflow by rolling over
+        loopcounter=0;// prevent overflow by rolling over
     }
-    myFile.close();
 }
 
 
