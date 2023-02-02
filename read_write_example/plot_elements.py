@@ -20,11 +20,18 @@ mytype = dtype(
             # https://stackoverflow.com/questions/32440081/why-is-the-sizeof-of-a-structure-larger-than-the-sum-of-its-parts
             # ("garbage","<u2"),
             # BUT arduino gives sizeof as 6, so there is no garbage 
-            ("time","<i4"), # search "arduino long int size" for the size here
+            ("time","<u4"), # search "arduino long int size" for the size here
+            ("finetime","<u4"), # search "arduino long int size" for the size here
             ]
         )
 result = fromfile("TEST.DAT", dtype=mytype)
 print("length of result:",len(result))
-print(result["voltage"],result["time"])
+for thiselem in result:
+    print(thiselem)
+#print(result["voltage"][0:20],result["time"][0:20])
 plot(result["time"], result["voltage"], "o-")
+title('vs milliseconds')
+figure()
+plot(result["finetime"], result["voltage"], "o-")
+title('vs microseconds')
 show()

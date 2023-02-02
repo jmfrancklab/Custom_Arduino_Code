@@ -4,26 +4,26 @@
 #include <SD.h>
 #define SD_CHIP_SELECT_PIN 4
 
-File myFile;
-int loopcounter;
-int datalen = 10;
-
 //A structure which two elements
 struct Datastore {
     // note that the types on the arduino are slightly different, and you should
     // make sure that you match the type of the data that you're trying to
     // store!!
     unsigned int Voltage; // this should just be a raw arduino reading DO NOT DO THE OD MATH ON THE ARDUINO!!!
-    long int time; // similarly, just the result of millis
+    unsigned long int time; // similarly, just the result of millis
+    unsigned long int time_short;
 };
 
+File myFile;
+int loopcounter;
+
 const char *filename="test.dat";
+
+int data_written;
+unsigned long int start_time;
+
 void setup()
 {
-
-
-
-
     // Open serial communications and wait for port to open:
     Serial.begin(9600);
     digitalWrite(10,HIGH);
@@ -41,31 +41,53 @@ void setup()
     if(SD.exists(filename)){
         SD.remove(filename);
     }
-    myFile = SD.open(filename, FILE_WRITE);
     loopcounter = 0;
+    start_time = millis();
+    data_written = 0;
 }
 
-void loop(){
-    int j;
+void loop()
+{
+    int datalen = 10;
+    Datastore mydata[datalen];// Datastore needs to be declared locally, not globally
+    int j,k;
     int num_written;
-    Datastore mydata[datalen];
-    if(loopcounter==0){
-        for(j=0;j<datalen;j++){
-            mydata[j].Voltage = j*10; // generate fake voltage data that's just 0, 10, 20... 90
-            mydata[j].time = j + 1000; // generate fake time data that's 0.1, 1.1, 2.1, etc.
-                                       //printf("wrote %d %f\n",mydata[j].Voltage, mydata[j].time);
+    j = loopcounter % datalen;
+    // open the file. note that only one file can be open at a time,
+    myFile = SD.open(filename, FILE_WRITE);// we can't do this in setup -- I tried! -- do it every time!
+    if(millis() - start_time < 200) // go for 2 secs -- in reality, could be replaced with button press, etc.
+    {
+        mydata[j].Voltage = (loopcounter % 5) * 10; // generate fake voltage data that's just 0, 10, 20... 40 and cycles
+        mydata[j].time = millis();
+        mydata[j].time_short = micros();
+        Serial.println("j,V,t:");
+        //Serial.println(loopcounter % 5);
+        Serial.println(j);
+        Serial.println(mydata[j].Voltage);
+        Serial.println(mydata[j].time);
+        if (loopcounter>0 && j == datalen-1){// write data only once we've filled up mydata
+            for(k=0;k<datalen;k++){
+              Serial.print("datapoint: ");
+              Serial.print(k); Serial.print(": ");
+              Serial.print(mydata[k].Voltage);
+              Serial.print(",");
+              Serial.println(mydata[k].time);
+            }
+            num_written = myFile.write((const uint8_t *)mydata, sizeof(mydata));
+
+            Serial.println("wrote a chunk");
+            Serial.println(num_written);
         }
-        // {{{ in this block, the arduino commands will be similar, but somewhat different!
-        num_written = myFile.write((const uint8_t *)mydata, sizeof(mydata));
-        myFile.close();
-        Serial.println("wrote data");
-        Serial.println("use this to det struct size");
-        Serial.println(sizeof(mydata));
-        Serial.println("this is how much I wrote");
-        Serial.println(num_written);
+    }else if(loopcounter>0 && !data_written){
+        Serial.println("binary data done");
+        data_written = 1;
     }
-    // }}}
+    
     loopcounter += 1;
+    if(loopcounter>50000 && loopcounter % datalen == 0){
+      loopcounter=0;// prevent overflow by rolling over
+    }
+    myFile.close();
 }
 
 
