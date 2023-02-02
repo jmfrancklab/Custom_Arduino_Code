@@ -20,7 +20,7 @@ mytype = dtype(
             # https://stackoverflow.com/questions/32440081/why-is-the-sizeof-of-a-structure-larger-than-the-sum-of-its-parts
             # ("garbage","<u2"),
             # BUT arduino gives sizeof as 6, so there is no garbage 
-            ("time","<f4"), # search "arduino float size" for the size here
+            ("time","<i4"), # search "arduino long int size" for the size here
             ]
         )
 result = fromfile("TEST.DAT", dtype=mytype)
