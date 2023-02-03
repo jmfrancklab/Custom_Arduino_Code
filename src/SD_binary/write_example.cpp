@@ -37,14 +37,14 @@ void setup()
     }
     Serial.println("initialization done.");
 
-    // open the file. note that only one file can be open at a time,
-    // so you have to close this one before opening another.
+    // Write adds to end, so remove any preexisting file
     if(SD.exists(filename)){
         SD.remove(filename);
     }
     loopcounter = 0;
     start_time = millis();
     data_written = 0;
+    // Open once, at the beginning 
     myFile = SD.open(filename, FILE_WRITE);
 }
 
@@ -53,7 +53,6 @@ void loop()
     int j,k;
     int num_written;
     j = loopcounter % datalen;
-    // open the file. note that only one file can be open at a time,
     if(millis() - start_time < 3000) // go for 3 secs -- in reality, could be replaced with button press, etc.
     {
         mydata[j].Voltage = (loopcounter % 5) * 10; // generate fake voltage data that's just 0, 10, 20... 40 and cycles
@@ -78,6 +77,7 @@ void loop()
             Serial.println(num_written);
         }
     }else if(loopcounter>0 && !data_written){
+        // This means we're done, so go ahead and close the file
         Serial.println("binary data done");
         data_written = 1;
         myFile.close();
