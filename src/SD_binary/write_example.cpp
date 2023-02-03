@@ -17,7 +17,7 @@ struct Datastore {
 File myFile;
 int loopcounter;// I had thought about making this long, but if we do that, and do math with regular numbers, everything goes crazy!
 const int datalen = 10;
-const char *filename="test.dat";
+char *filename="test.dat";
 Datastore mydata[datalen];
 
 int data_written;
@@ -71,12 +71,12 @@ void loop()
                 Serial.print(",");
                 Serial.println(mydata[k].time);
             }
-            num_written = myFile.write((const uint8_t *)mydata, sizeof(mydata));
+            num_written = myFile.write((const uint8_t *)mydata, sizeof(mydata));//Paratenies before variable declares variable 
 
             Serial.println("wrote a chunk");
             Serial.println(num_written);
         }
-    }else if(loopcounter>0 && !data_written){
+    }else if(loopcounter>0 && !data_written){//Single "an" is pointer converter double and is logical "and" operator
         // This means we're done, so go ahead and close the file
         Serial.println("binary data done");
         data_written = 1;
