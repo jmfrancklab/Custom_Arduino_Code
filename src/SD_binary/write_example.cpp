@@ -17,6 +17,8 @@ struct Datastore {
 void setup()
 {
   // Open serial communications and wait for port to open:
+  SD.begin(4);
+  
   Serial.begin(9600);
   digitalWrite(10,HIGH);
 
@@ -33,7 +35,7 @@ void setup()
   myFile = SD.open("test.dat", FILE_WRITE);
 }
 
-int main(void)
+void loop()
 {
     int j;
     int datalen = 10;
@@ -49,11 +51,11 @@ int main(void)
     //printf("sizeof voltage %d time %d overall %d\n",sizeof mydata[0].Voltage,
     //        sizeof mydata[0].time, sizeof mydata[0]);
     // {{{ in this block, the arduino commands will be similar, but somewhat different!
-    size_t r1 = myFile.write(mydata, sizeof(mydata));
+   // myFile.write(mydata, sizeof(mydata));
     //in the example, he does this, which doesn't seem right to me --
     //mydata without an array index is already a pointer, so what's up
     //with this?
-    //size_t r1 = myFile.write((const uint8_t *)&mydata, sizeof(mydata));
+    myFile.write((const uint8_t *)&mydata, sizeof(mydata));
     //printf("wrote %zu elements out of %d requested\n", r1,  datalen);
     myFile.close();
     // }}}
