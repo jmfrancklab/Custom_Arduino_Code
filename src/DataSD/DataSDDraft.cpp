@@ -15,11 +15,11 @@ int numReadings;
 //Analog number recorded onto the SD
 int ODRecord;
 //Readings Counter Goal
-int numReadTar =5 ;
+int numReadTar =5;
 //Readings Counter
 int numRead;
 //File indentifier
-File file;
+File myfile;
 
 //Making a structure with the needed variables
 struct Datastore {
@@ -31,41 +31,23 @@ struct Datastore {
     
 };
 
-File myfile;
 
 //Now making a specific data type from the prevously defined structure
 
 Datastore logchunk[1];
-
-
-
-//This makes a structure which can record file size
-//This will be referenced over time
-
-
-
-
-
-
 
 void setup(){
 /*Setting pins*/
 pinMode(A0,INPUT);
 digitalWrite(10,HIGH);
 //Making name of file
- //why not const char here
- const char *filename = "SD.Logger.dat";
-//Setting up the file instance and begining SD
-SD.begin(SD_CHIP_SELECT_PIN);
+//why not const char here
+char *filename = "SD.Logger.dat";
+
 //Now making file opener
+
 myfile = SD.open(filename,FILE_WRITE);
-
-
-
-
-
-
-
+ 
 //Starting serial terminal and making average control
 
 Serial.begin(9600);
@@ -73,21 +55,14 @@ ODRecord = 0;
 numRead = 0;
 OD = 0;
 
-
-
 }
-
-
 
 void loop(){
 //After Recording Value onto SD the num Reader goes back to zero
-
-
-
+digitalWrite(10,HIGH);
 OD = analogRead(ReadOD);
 ODRecord += OD;
 numRead += 1;
-
 
 //Now using if statement to determine if the number of readings were met
 
@@ -101,14 +76,19 @@ Serial.print(" At time: ");
 Serial.print(millis()/500);
 Serial.println(" Seconds");
 
-
 //Recording OD variable within the strucure datalog
+
 logchunk[1].AnalogOD = ODRecord;
 logchunk[1].time = millis()/1000;
+
 //Once the data is written to the structure the SD commands will write to file
-myfile.write((const uint8_t *)logchunk, sizeof(1));
+
+myfile.write((uint8_t *)logchunk, sizeof(1));
+
 //Will now close the file to make sure data is saved
+
 myfile.close();
+
 //Resetting the Counters and the Recordering Variable
 
 numRead = 0;
