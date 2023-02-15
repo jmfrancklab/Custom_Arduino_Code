@@ -10,16 +10,20 @@ THIS IS ONLY SETTING UP THE VARIABLES*/
 int VRead; //Sets up a reader for Analog Voltage Reading to A0
 
 int NumCount; //Sets up a number counter to track the amount of times VRead Before Averaging it
+              // note that you don't necessarily need to average any more --
+              // since you're storing binary, you could maybe just log
+              // continuously (depending on how much data that would generate)
+              // For now, let's leave it how it is, and see how much data is accumulated in a minute.
 
-int VRec; //The value which is set to the number which is read to the serial
+float VRec; //This is your average value -- because it comes from a division, let's use a floating point here
 
 int numtarget =  10; // The value which is set for the amount of data taken before an accuracy check
+                     // don't know what an accuracy check is
 
 int astore; // The  value which holds the analog input sum until it is time to dump the average
-
-bool stop = false; // A boolean value to help with ending the datastoring script
-
-
+            // I ask -- if averaging, why not just store the average in a
+            // floating point number, and each time you acquire data,
+            // add VRead/NumCount
 
 
 //A structure which two elements
@@ -64,36 +68,59 @@ void setup()
     data_written = 0;
     // Open once, at the beginning 
     myFile = SD.open(filename, FILE_WRITE);
+    // since this is inside the setup() function, I indent it for readability
+    //
+    /*This is where I start the set up I WILL SET THE READINGS VALUES TO ZERO TO BEGIN WITH*/
 
+    VRead = 0; // All variables will start a zero and will change as we continue
+    NumCount = 0;
+    VRec = 0;
+    astore = 0;
 
-/*This is where I start the set up I WILL SET THE READINGS VALUES TO ZERO TO BEGIN WITH*/
+    //Setting the pin modes
 
-VRead = 0; // All variables will start a zero and will change as we continue
-NumCount = 0;
-VRec = 0;
-astore = 0;
+    pinMode(A0, INPUT);
 
-
-//Setting the pin modes
-
-pinMode(A0, INPUT);
-
-//The serial begin has already been set so I will no do that
-
-
-
-
+    //The serial begin has already been set so I will no do that
 }
-
 
 void loop()
 {
-    while( stop == false){ /* Allow for the two serial outputs to not be juggled */
     int j,k;
     int num_written;
     j = loopcounter % datalen;
     if(millis() - start_time < 3000) // go for 3 secs -- in reality, could be replaced with button press, etc.
     {
+        //// {{{ Serial logging -- this is your code -- I just moved it inside
+        ///      the code block that was intended for detection.  It doesn't
+        ///      make sense for this to be in an outer block -- you want the
+        ///      actual acquisition to replace the fake data!
+        
+        //Now starting the edit to the serial logging
+
+        VRead = analogRead(A0);
+        astore += VRead;
+        NumCount += 1;
+
+        if(NumCount == numtarget){
+            VRec = (float) astore/(float) numtarget; //Calculating the average of the given data
+            // previous converted to a floating point, otherwise you are losing accuracy.
+            // this does meant that we will need to change the structure and
+            // the file that reads the structure.
+            NumCount = 0;
+            astore = 0;
+            Serial.print("Analog (V) of ");
+            Serial.print(VRec);
+            Serial.print(" at time: ");
+            Serial.print(millis()/1000); // Taking the millis and dividing by 1000 to record seconds
+            Serial.println(" sec");
+            // I removed the delay statement here -- not sure what purpose it was serving
+            
+            // note that if we stick with averaging, we would only write the
+            // averaged points to the binary data, so all the stuff below would
+            // be added to this block, here.
+        }
+        // }}}
         mydata[j].Voltage = (loopcounter % 5) * 10; // generate fake voltage data that's just 0, 10, 20... 40 and cycles
         mydata[j].time = millis();
         mydata[j].time_short = micros();
@@ -110,55 +137,22 @@ void loop()
                 Serial.print(",");
                 Serial.println(mydata[k].time);
             }
-            num_written = myFile.write((const uint8_t *)mydata, sizeof(mydata));//Paratenies before variable declares variable 
+            num_written = myFile.write((const uint8_t *)mydata, sizeof(mydata));//Parentheses before variable declares variable 
 
             Serial.println("wrote a chunk");
             Serial.println(num_written);
-            
         }
-    }else if(loopcounter>0 && !data_written){//Single "an" is pointer converter double and is logical "and" operator
+    }else if(loopcounter>0 && !data_written){//Single "&" is pointer converter double and is logical "and" operator
         // This means we're done, so go ahead and close the file
-        stop = true;
         Serial.println("binary data done");
         data_written = 1;
         myFile.close();
-        Serial.println("Start Regular Analog Reading");
-        delay(1000);
-
     }
 
-
-    
-    
     loopcounter += 1;
-    }
     if(loopcounter>50000 && loopcounter % datalen == 0){
         loopcounter=0;// prevent overflow by rolling over
     }
-    //Now starting the edit to the serial logging
-
-    VRead = analogRead(A0);
-    astore += VRead;
-    NumCount += 1;
-
-if(NumCount == numtarget){
-VRec = astore/numtarget; //Calculating the average of the given data
-NumCount = 0;
-astore = 0;
-Serial.print("Analog (V) of ");
-Serial.print(VRec);
-Serial.print(" at time: ");
-Serial.print(millis()/1000); // Taking the millis and dividing by 1000 to record seconds
-Serial.println(" sec");
-//END OF EDITS 
-delay(1000);
-
 }
-
-}
-
-
-
-
 
 
