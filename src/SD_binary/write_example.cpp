@@ -17,7 +17,7 @@ int numtarget =  10; // The value which is set for the amount of data taken befo
 
 int astore; // The  value which holds the analog input sum until it is time to dump the average
 
-bool stop = false;
+bool stop = false; // A boolean value to help with ending the datastoring script
 
 
 
