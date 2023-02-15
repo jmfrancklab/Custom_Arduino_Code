@@ -13,10 +13,11 @@ int NumCount; //Sets up a number counter to track the amount of times VRead Befo
 
 int VRec; //The value which is set to the number which is read to the serial
 
-int numtarget =  5; // The value which is set for the amount of data taken before an accuracy check
+int numtarget =  10; // The value which is set for the amount of data taken before an accuracy check
 
 int astore; // The  value which holds the analog input sum until it is time to dump the average
 
+bool stop = false;
 
 
 
@@ -81,11 +82,13 @@ pinMode(A0, INPUT);
 
 
 
+
 }
 
 
 void loop()
 {
+    while( stop == false){ /* Allow for the two serial outputs to not be juggled */
     int j,k;
     int num_written;
     j = loopcounter % datalen;
@@ -111,15 +114,24 @@ void loop()
 
             Serial.println("wrote a chunk");
             Serial.println(num_written);
+            
         }
     }else if(loopcounter>0 && !data_written){//Single "an" is pointer converter double and is logical "and" operator
         // This means we're done, so go ahead and close the file
+        stop = true;
         Serial.println("binary data done");
         data_written = 1;
         myFile.close();
+        Serial.println("Start Regular Analog Reading");
+        delay(1000);
+
     }
+
+
+    
     
     loopcounter += 1;
+    }
     if(loopcounter>50000 && loopcounter % datalen == 0){
         loopcounter=0;// prevent overflow by rolling over
     }
@@ -137,8 +149,9 @@ Serial.print("Analog (V) of ");
 Serial.print(VRec);
 Serial.print(" at time: ");
 Serial.print(millis()/1000); // Taking the millis and dividing by 1000 to record seconds
-Serial.print(" sec");
+Serial.println(" sec");
 //END OF EDITS 
+delay(1000);
 
 }
 
