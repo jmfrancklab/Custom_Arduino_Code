@@ -3,6 +3,23 @@
 #include <SPI.h>
 #include <SD.h>
 #define SD_CHIP_SELECT_PIN 4
+/* This is where  is where I start my addition of the logging code without touching the rest
+
+THIS IS ONLY SETTING UP THE VARIABLES*/
+
+int VRead; //Sets up a reader for Analog Voltage Reading to A0
+
+int NumCount; //Sets up a number counter to track the amount of times VRead Before Averaging it
+
+int VRec; //The value which is set to the number which is read to the serial
+
+int numtarget =  5; // The value which is set for the amount of data taken before an accuracy check
+
+int astore; // The  value which holds the analog input sum until it is time to dump the average
+
+
+
+
 
 //A structure which two elements
 struct Datastore {
@@ -46,7 +63,26 @@ void setup()
     data_written = 0;
     // Open once, at the beginning 
     myFile = SD.open(filename, FILE_WRITE);
+
+
+/*This is where I start the set up I WILL SET THE READINGS VALUES TO ZERO TO BEGIN WITH*/
+
+VRead = 0; // All variables will start a zero and will change as we continue
+NumCount = 0;
+VRec = 0;
+astore = 0;
+
+
+//Setting the pin modes
+
+pinMode(A0, INPUT);
+
+//The serial begin has already been set so I will no do that
+
+
+
 }
+
 
 void loop()
 {
@@ -82,12 +118,34 @@ void loop()
         data_written = 1;
         myFile.close();
     }
-
+    
     loopcounter += 1;
     if(loopcounter>50000 && loopcounter % datalen == 0){
         loopcounter=0;// prevent overflow by rolling over
     }
+    //Now starting the edit to the serial logging
+
+    VRead = analogRead(A0);
+    astore += VRead;
+    NumCount += 1;
+
+if(NumCount == numtarget){
+VRec = astore/numtarget; //Calculating the average of the given data
+NumCount = 0;
+astore = 0;
+Serial.print("Analog (V) of ");
+Serial.print(VRec);
+Serial.print(" at time: ");
+Serial.print(millis()/1000); // Taking the millis and dividing by 1000 to record seconds
+Serial.print(" sec");
+//END OF EDITS 
+
 }
+
+}
+
+
+
 
 
 
