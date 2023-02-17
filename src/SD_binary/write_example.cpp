@@ -31,8 +31,8 @@ struct Datastore {
     // note that the types on the arduino are slightly different, and you should
     // make sure that you match the type of the data that you're trying to
     // store!!
-    unsigned int Voltage; // this should just be a raw arduino reading DO NOT DO THE OD MATH ON THE ARDUINO!!!
-    unsigned long int time; // similarly, just the result of millis
+    float Voltage; // this should just be a raw arduino reading DO NOT DO THE OD MATH ON THE ARDUINO!!!
+    float time; // similarly, just the result of millis
     
 };
 
@@ -151,7 +151,7 @@ void loop()
                 Serial.println(mydata[i].time);
                 }
     
-            num_written = myFile.write((const uint8_t *)mydata, sizeof(mydata));//Parentheses before variable declares variable 
+            myFile.write((const uint8_t*)mydata, 10 * sizeof(float));//Parentheses before variable declares variable  changiing the writing command 
             loopcounter = 0; // If the loop counter is maxed it will dump and then reset (Which I think is j?)
 
             
