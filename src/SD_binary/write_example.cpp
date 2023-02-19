@@ -32,15 +32,16 @@ struct Datastore {
     // make sure that you match the type of the data that you're trying to
     // store!!
     float Voltage; // this should just be a raw arduino reading DO NOT DO THE OD MATH ON THE ARDUINO!!!
-    float time; // similarly, just the result of millis
-    
+    unsigned long int time; // similarly, just the result of millis
+    unsigned long int time_short;
 };
 
 File myFile;
-int loopcounter;// I had thought about making this long, but if we do that, and do math with regular numbers, everything goes crazy!
+// note that I renamed totalDatapointCounter to totalDatapointCounter, since it represents the total number of (averaged) datapoints that we've stored
+int totalDatapointCounter;// I had thought about making this long, but if we do that, and do math with regular numbers, everything goes crazy!
 const int datalen = 10;
 char *filename="test.dat";
-Datastore mydata[datalen];
+Datastore mydata[datalen];// this is the "buffer" -- we want to hold as many datapoints in memory as possible, since writing to disk is the slow step
 
 int data_written;
 unsigned long int start_time;
@@ -63,7 +64,7 @@ void setup()
     if(SD.exists(filename)){
         SD.remove(filename);
     }
-    loopcounter = 0;
+    totalDatapointCounter = 0;
     start_time = millis();
     data_written = 0;
     // Open once, at the beginning 
@@ -88,9 +89,10 @@ void loop()
 {
     int j; // k not needed now 
     int num_written;
-    j = loopcounter; //Not makeing fake data anymore so just if loop == datalen is enough 
+    j = totalDatapointCounter % datalen; // this line does not have to do with fake data -- it's the position of the current datapoint in the "buffer"
     if(millis() - start_time < 10000) // go for 10 secs -- in reality, could be replaced with button press, etc.
-    { //Will probably put a button circuit and have it check the analog reading every second and switch a boolean value to stop program
+                                      // Will probably put a button circuit and have it check the analog reading every second and switch a boolean value to stop program
+    {   
         //// {{{ Serial logging -- this is your code -- I just moved it inside
         ///      the code block that was intended for detection.  It doesn't
         ///      make sense for this to be in an outer block -- you want the
@@ -106,12 +108,12 @@ void loop()
             VRec = (float) astore/(float) numtarget; //Calculating the average of the given data
             // previous converted to a floating point, otherwise you are losing accuracy.
             // this does meant that we will need to change the structure and
-            // the file that reads the structure
-
-            
-
-
+            // the file that reads the structure.
             NumCount = 0;
+            totalDatapointCounter += 1; // increment this here, since if we're averaging, we only want a new datapoint for every averaged point that we generate
+            if(totalDatapointCounter>50000 && totalDatapointCounter % datalen == 0){
+                totalDatapointCounter=0;// prevent overflow by rolling over
+            }
             astore = 0;
             Serial.print("Analog (V) of ");
             Serial.print(VRec);
@@ -123,68 +125,29 @@ void loop()
             // note that if we stick with averaging, we would only write the
             // averaged points to the binary data, so all the stuff below would
             // be added to this block, here.
-        }
-        // }}}
-        mydata[j].Voltage = VRec; //Attempting to actually log data
-        mydata[j].time = millis();
-       // Deleted the extratime not relevent to the time stored
-       //  Serial.println("j,V,t:"); not needed now
-        //Serial.println(loopcounter % 5);
-        // Not needed now Serial.println(j);
-        
-        
-        /*Serial.println(mydata[j].Voltage);
-        Serial.println(mydata[j].time);*/  //Got rid of data prints not needed
-
-        loopcounter +=1; //Adding loopcounter value
-        if (loopcounter>0 && loopcounter == datalen){// write data only once we've filled up mydata dont know why -1
-            
-            
-         // CHAT GPT TESTING TO FIGURE OUT IF STRUCTURE IS ACTUALLY BEING STORED
-
-          // When loopcounter reaches datalen, print the data to the serial monitor
-            Serial.println("Datastore:");
-            for (int i=0; i<datalen; i++) {
-                Serial.print("  Voltage: ");
-                Serial.print(mydata[i].Voltage);
-                Serial.print(", Time: ");
-                Serial.println(mydata[i].time);
+            mydata[j].Voltage = VRec; // Attempting to actually log data
+            mydata[j].time = millis();
+            mydata[j].time_short = micros(); // you are not understanding the purpose of the two times -- leave them
+            if (totalDatapointCounter>0 && j == datalen-1){// write data only once we've filled up mydata
+                for(k=0;k<datalen;k++){
+                    Serial.print("datapoint: ");
+                    Serial.print(k); Serial.print(": ");
+                    Serial.print(mydata[k].Voltage);
+                    Serial.print(",");
+                    Serial.println(mydata[k].time);
                 }
-    
-            myFile.write((const uint8_t*)mydata, 10 * sizeof(float));//Parentheses before variable declares variable  changiing the writing command 
-            loopcounter = 0; // If the loop counter is maxed it will dump and then reset (Which I think is j?)
-
-            
-            
-            /*
-            
-            for(k=0;k<datalen;k++){
-                
-                
-                Serial.print("datapoint: ");
-                Serial.print(k); Serial.print(": ");
-                Serial.print(mydata[k].Voltage);
-                Serial.print(",");
-                Serial.println(mydata[k].time);
-                
-               //Will get rid of code here for now since this is fake data
-            
+                num_written = myFile.write((const uint8_t *)mydata, sizeof(mydata));//Parentheses before variable declares variable 
+                Serial.println("wrote a chunk");
+                Serial.println(num_written); // this checks if the data is being written!!  also, we need to know this number to understand how to read it! report this number
             }
-            */
-            
-            
-            Serial.println("wrote a chunk");
-           // Serial.println(num_written);  Not needed so far
         }
-    }else if(loopcounter>0 && !data_written){//Single "&" is pointer converter double and is logical "and" operator
+        }
+    }else if(totalDatapointCounter>0 && !data_written){//Single "&" is pointer converter double and is logical "and" operator
         // This means we're done, so go ahead and close the file
         Serial.println("binary data done");
         data_written = 1;  //Assuing a logical operator
         myFile.close();
     }
-
-   // Got rid of ending for now
-
 
 }
 
