@@ -87,7 +87,7 @@ void setup()
 
 void loop()
 {
-    int j; // k not needed now 
+    int j,k;
     int num_written;
     j = totalDatapointCounter % datalen; // this line does not have to do with fake data -- it's the position of the current datapoint in the "buffer"
     if(millis() - start_time < 10000) // go for 10 secs -- in reality, could be replaced with button press, etc.
