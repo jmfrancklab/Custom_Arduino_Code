@@ -25,6 +25,9 @@ int astore; // The  value which holds the analog input sum until it is time to d
             // floating point number, and each time you acquire data,
             // add VRead/NumCount
 
+            // Eli Response 2/18 : I don't understand your idea 
+
+
 
 //A structure which two elements
 struct Datastore {
@@ -33,13 +36,13 @@ struct Datastore {
     // store!!
     float Voltage; // this should just be a raw arduino reading DO NOT DO THE OD MATH ON THE ARDUINO!!!
     unsigned long int time; // similarly, just the result of millis
-    unsigned long int time_short;
+    unsigned long int time_short;  //What is the purpose of this
 };
 
 File myFile;
 // note that I renamed totalDatapointCounter to totalDatapointCounter, since it represents the total number of (averaged) datapoints that we've stored
 int totalDatapointCounter;// I had thought about making this long, but if we do that, and do math with regular numbers, everything goes crazy!
-const int datalen = 10;
+const int datalen = 10;  //So ten data points will be stored at a time? 2/18/ --Eli Paster 
 char *filename="test.dat";
 Datastore mydata[datalen];// this is the "buffer" -- we want to hold as many datapoints in memory as possible, since writing to disk is the slow step
 
@@ -55,28 +58,28 @@ void setup()
     Serial.print("Initializing SD card...");
 
     if (!SD.begin(SD_CHIP_SELECT_PIN)) {//even though this argument is technically optional, we do need to select chip 4 for this to work!!
-        Serial.println("initialization failed!");
+        Serial.println("initialization failed!");  //Shows a problem if the SD never acually is reconigized by arduino 
         return;
     }
-    Serial.println("initialization done.");
+    Serial.println("initialization done.");  //Confirms Arduino SD error is not the problem
 
     // Write adds to end, so remove any preexisting file
-    if(SD.exists(filename)){
-        SD.remove(filename);
+    if(SD.exists(filename)){ // If already a file
+        SD.remove(filename);  // Remove the file to stop weird confusing 
     }
-    totalDatapointCounter = 0;
+    totalDatapointCounter = 0;  //Not sure what this is for yet maybe relevent as we go down?
     start_time = millis();
-    data_written = 0;
+    data_written = 0; // Initial Setting of the live count of how many data points are within the structure at this point
     // Open once, at the beginning 
-    myFile = SD.open(filename, FILE_WRITE);
+    myFile = SD.open(filename, FILE_WRITE); // Making an iterator which stores an instance to access the file class SHOULD LEARN MORE ABOUT AN INSTANCE
     // since this is inside the setup() function, I indent it for readability
     //
     /*This is where I start the set up I WILL SET THE READINGS VALUES TO ZERO TO BEGIN WITH*/
 
     VRead = 0; // All variables will start a zero and will change as we continue
-    NumCount = 0;
-    VRec = 0;
-    astore = 0;
+    NumCount = 0;  //The number counter which helps with making sure no extranous points are written withing the structure ex random 1024 jumps somtimes may happen
+    VRec = 0; // The actual data point which is averaged 
+    astore = 0;  // The consectutive reading of the analog will be added here and then divided once the numcount reaches its target
 
     //Setting the pin modes
 
@@ -87,10 +90,10 @@ void setup()
 
 void loop()
 {
-    int j,k;
+    int j,k; //
     int num_written;
     j = totalDatapointCounter % datalen; // this line does not have to do with fake data -- it's the position of the current datapoint in the "buffer"
-    if(millis() - start_time < 10000) // go for 10 secs -- in reality, could be replaced with button press, etc.
+    while(millis() - start_time < 10000) // go for 10 secs -- in reality, could be replaced with button press, etc.
                                       // Will probably put a button circuit and have it check the analog reading every second and switch a boolean value to stop program
     {   
         //// {{{ Serial logging -- this is your code -- I just moved it inside
@@ -100,7 +103,7 @@ void loop()
         
         //Now starting the edit to the serial logging
 
-        VRead = analogRead(A0);
+        VRead = (float) analogRead(A0);
         astore += VRead;
         NumCount += 1;
 
@@ -139,16 +142,29 @@ void loop()
                 num_written = myFile.write((const uint8_t *)mydata, sizeof(mydata));//Parentheses before variable declares variable 
                 Serial.println("wrote a chunk");
                 Serial.println(num_written); // this checks if the data is being written!!  also, we need to know this number to understand how to read it! report this number
+                delay(250); //To stop data from being extremly overflown very quickly
             }
         }
-        }
-    }else if(totalDatapointCounter>0 && !data_written){//Single "&" is pointer converter double and is logical "and" operator
+        
+     else if (totalDatapointCounter>0 && !data_written){//Single "&" is pointer converter double and is logical "and" operator
         // This means we're done, so go ahead and close the file
         Serial.println("binary data done");
         data_written = 1;  //Assuing a logical operator
         myFile.close();
+        //digitalWrite(10, LOW); // CHAT GPT GAVE THIS A TRY
+        // Entering this in gives this output when runned 
+
+        /* -- Terminal on /dev/cu.usbmodem141101 | 9600 8-N-1
+--- Available filters and text transformations: colorize, debug, default, direct, hexlify, log2file, nocontrol, printable, send_on_enter, time
+--- More details at https://bit.ly/pio-monitor-filters
+--- Quit: Ctrl+C | Menu: Ctrl+T | Help: Ctrl+T followed by Ctrl+H
+Initializing SD card...initialization done.
+Analog (V) of 32.70 at time: 0 sec
+binary data done*/
+
     }
 
+}
 }
 
 
