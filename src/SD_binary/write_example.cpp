@@ -31,7 +31,7 @@ struct Datastore {
     // note that the types on the arduino are slightly different, and you should
     // make sure that you match the type of the data that you're trying to
     // store!!
-    float Voltage; // this should just be a raw arduino reading DO NOT DO THE OD MATH ON THE ARDUINO!!!
+    unsigned long int Voltage; // this should just be a raw arduino reading DO NOT DO THE OD MATH ON THE ARDUINO!!!
     unsigned long int time; // similarly, just the result of millis
     unsigned long int time_short;
 };
@@ -40,7 +40,8 @@ File myFile;
 // note that I renamed totalDatapointCounter to totalDatapointCounter, since it represents the total number of (averaged) datapoints that we've stored
 int totalDatapointCounter;// I had thought about making this long, but if we do that, and do math with regular numbers, everything goes crazy!
 const int datalen = 10;
-char *filename="test.dat";
+char *filename="test.dat"; //Always cast [{"message": "ISO C++ forbids converting a string constant to 'char*' [-Wwrite-strings]"]
+	
 Datastore mydata[datalen];// this is the "buffer" -- we want to hold as many datapoints in memory as possible, since writing to disk is the slow step
 
 int data_written;
@@ -61,14 +62,16 @@ void setup()
     Serial.println("initialization done.");
 
     // Write adds to end, so remove any preexisting file
-    if(SD.exists(filename)){
+    if(SD.exists(filename)){// This always flashes this
         SD.remove(filename);
     }
     totalDatapointCounter = 0;
     start_time = millis();
     data_written = 0;
     // Open once, at the beginning 
-    myFile = SD.open(filename, FILE_WRITE);
+    
+    
+    myFile = SD.open(filename, FILE_WRITE| O_CREAT| O_TRUNC);// Did not work as well
     // since this is inside the setup() function, I indent it for readability
     //
     /*This is where I start the set up I WILL SET THE READINGS VALUES TO ZERO TO BEGIN WITH*/
@@ -87,12 +90,12 @@ void setup()
 
 void loop()
 {
-    int j; // k not needed now 
+    int j, k; // k not needed now 
     int num_written;
     j = totalDatapointCounter % datalen; // this line does not have to do with fake data -- it's the position of the current datapoint in the "buffer"
     if(millis() - start_time < 10000) // go for 10 secs -- in reality, could be replaced with button press, etc.
                                       // Will probably put a button circuit and have it check the analog reading every second and switch a boolean value to stop program
-    {   
+    {
         //// {{{ Serial logging -- this is your code -- I just moved it inside
         ///      the code block that was intended for detection.  It doesn't
         ///      make sense for this to be in an outer block -- you want the
@@ -105,7 +108,7 @@ void loop()
         NumCount += 1;
 
         if(NumCount == numtarget){
-            VRec = (float) astore/(float) numtarget; //Calculating the average of the given data
+            VRec = (float) astore/(float) numtarget; //Calculating the average of the given data // Why floats here!!!
             // previous converted to a floating point, otherwise you are losing accuracy.
             // this does meant that we will need to change the structure and
             // the file that reads the structure.
@@ -129,26 +132,35 @@ void loop()
             mydata[j].time = millis();
             mydata[j].time_short = micros(); // you are not understanding the purpose of the two times -- leave them
             if (totalDatapointCounter>0 && j == datalen-1){// write data only once we've filled up mydata
-                for(k=0;k<datalen;k++){
-                    Serial.print("datapoint: ");
-                    Serial.print(k); Serial.print(": ");
-                    Serial.print(mydata[k].Voltage);
-                    Serial.print(",");
-                    Serial.println(mydata[k].time);
-                }
-                num_written = myFile.write((const uint8_t *)mydata, sizeof(mydata));//Parentheses before variable declares variable 
-                Serial.println("wrote a chunk");
-                Serial.println(num_written); // this checks if the data is being written!!  also, we need to know this number to understand how to read it! report this number
+            for(k=0;k<datalen;k++){
+                Serial.print("datapoint: ");
+                Serial.print(k); Serial.print(": ");
+                Serial.print(mydata[k].Voltage);
+                Serial.print(",");
+                Serial.println(mydata[k].time);
+                
+            }
+            delay(250); // Allows me to access the code to a better degree
+            // myFile.write(reinterpret_cast<const uint8_t*>(&mydata), sizeof(mydata)); Thoughy maybe se need to directly call it
+            num_written = myFile.write(reinterpret_cast<const uint8_t*>(&mydata), sizeof(mydata));//Parentheses before variable declares variable //Trying to recast 
+            //Why does the reinterperate cast thing not work!
+            Serial.print(myFile.getWriteError());// Return True
+            Serial.println("wrote a chunk");
+            Serial.println(num_written); // this checks if the data is being written!!  also, we need to know this number to understand how to read it! report this number
+            //The num written is always zero!!
+            
             }
         }
-        }
-    }else if(totalDatapointCounter>0 && !data_written){//Single "&" is pointer converter double and is logical "and" operator
+        
+    else if(totalDatapointCounter>0 && !data_written){//Single "&" is pointer converter double and is logical "and" operator
         // This means we're done, so go ahead and close the file
         Serial.println("binary data done");
         data_written = 1;  //Assuing a logical operator
         myFile.close();
+        
     }
 
+}
 }
 
 
