@@ -36,17 +36,17 @@ struct Datastore {
     // store!!
     float Voltage; // this should just be a raw arduino reading DO NOT DO THE OD MATH ON THE ARDUINO!!!
     unsigned long int time; // similarly, just the result of millis
-    unsigned long int time_short;  //What is the purpose of this
+    unsigned long int time_short;  //What is the purpose of this JF answers -- to get more accurate time!
 };
 
 File myFile;
 // note that I renamed totalDatapointCounter to totalDatapointCounter, since it represents the total number of (averaged) datapoints that we've stored
 int totalDatapointCounter;// I had thought about making this long, but if we do that, and do math with regular numbers, everything goes crazy!
-const int datalen = 10;  //So ten data points will be stored at a time? 2/18/ --Eli Paster 
+const int datalen = 10;  //So ten data points will be stored at a time? 2/18/ --Eli Paster JF answers -- YES! but we can increase the size of this buffer just by changing this number
 char *filename="test.dat";
 Datastore mydata[datalen];// this is the "buffer" -- we want to hold as many datapoints in memory as possible, since writing to disk is the slow step
 
-int data_written;
+int file_is_closed;
 unsigned long int start_time;
 
 void setup()
@@ -67,9 +67,9 @@ void setup()
     if(SD.exists(filename)){ // If already a file
         SD.remove(filename);  // Remove the file to stop weird confusing 
     }
-    totalDatapointCounter = 0;  //Not sure what this is for yet maybe relevent as we go down?
+    totalDatapointCounter = 0;  // This is the total number of datapoints that have been acquired
     start_time = millis();
-    data_written = 0; // Initial Setting of the live count of how many data points are within the structure at this point
+    file_is_closed = 0; // this is a logical variable that tells us whether or not our acquisition is done.  Once file_is_closed is 1, acquisition stops.  I changed the name to better reflect what it's for.
     // Open once, at the beginning 
     myFile = SD.open(filename, FILE_WRITE); // Making an iterator which stores an instance to access the file class SHOULD LEARN MORE ABOUT AN INSTANCE
     // since this is inside the setup() function, I indent it for readability
@@ -93,17 +93,17 @@ void loop()
     int j,k; //
     int num_written;
     j = totalDatapointCounter % datalen; // this line does not have to do with fake data -- it's the position of the current datapoint in the "buffer"
-    while(millis() - start_time < 10000) // go for 10 secs -- in reality, could be replaced with button press, etc.
+    if(millis() - start_time < 10000) // go for 10 secs -- in reality, could be replaced with button press, etc.
                                       // Will probably put a button circuit and have it check the analog reading every second and switch a boolean value to stop program
     {   
         //// {{{ Serial logging -- this is your code -- I just moved it inside
         ///      the code block that was intended for detection.  It doesn't
         ///      make sense for this to be in an outer block -- you want the
         ///      actual acquisition to replace the fake data!
-        
+
         //Now starting the edit to the serial logging
 
-        VRead = (float) analogRead(A0);
+        VRead = analogRead(A0); // VRead is an integer, so it doesn't make sense to cast to a float!
         astore += VRead;
         NumCount += 1;
 
@@ -124,7 +124,7 @@ void loop()
             Serial.print(millis()/1000); // Taking the millis and dividing by 1000 to record seconds
             Serial.println(" sec");
             // I removed the delay statement here -- not sure what purpose it was serving
-            
+
             // note that if we stick with averaging, we would only write the
             // averaged points to the binary data, so all the stuff below would
             // be added to this block, here.
@@ -142,29 +142,15 @@ void loop()
                 num_written = myFile.write((const uint8_t *)mydata, sizeof(mydata));//Parentheses before variable declares variable 
                 Serial.println("wrote a chunk");
                 Serial.println(num_written); // this checks if the data is being written!!  also, we need to know this number to understand how to read it! report this number
-                delay(250); //To stop data from being extremly overflown very quickly
+                // we're not going to worry about data overflowing -- more measurements means more SNR!
             }
         }
-        
-     else if (totalDatapointCounter>0 && !data_written){//Single "&" is pointer converter double and is logical "and" operator
+    }else if(totalDatapointCounter>0 && !file_is_closed){//Single "&" is pointer converter double and is logical "and" operator
         // This means we're done, so go ahead and close the file
         Serial.println("binary data done");
-        data_written = 1;  //Assuing a logical operator
+        file_is_closed = 1;  //Assuing a logical operator
         myFile.close();
-        //digitalWrite(10, LOW); // CHAT GPT GAVE THIS A TRY
-        // Entering this in gives this output when runned 
-
-        /* -- Terminal on /dev/cu.usbmodem141101 | 9600 8-N-1
---- Available filters and text transformations: colorize, debug, default, direct, hexlify, log2file, nocontrol, printable, send_on_enter, time
---- More details at https://bit.ly/pio-monitor-filters
---- Quit: Ctrl+C | Menu: Ctrl+T | Help: Ctrl+T followed by Ctrl+H
-Initializing SD card...initialization done.
-Analog (V) of 32.70 at time: 0 sec
-binary data done*/
-
     }
-
-}
 }
 
 
