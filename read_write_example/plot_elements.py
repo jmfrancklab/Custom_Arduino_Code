@@ -14,7 +14,7 @@ mytype = dtype(
         # the numbers/sizes here are in bits -- these are taken from the
         # print sizeof command in the example
         [
-            ("voltage","<u2"), # search "arduino unsigned int" for the size here
+            ("voltage","<f4"), # search "arduino unsigned int" for the size here
             # garbage accounts for the fact that the overall is not equal
             # to the sum of the parts as explained here:
             # https://stackoverflow.com/questions/32440081/why-is-the-sizeof-of-a-structure-larger-than-the-sum-of-its-parts

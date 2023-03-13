@@ -1,6 +1,6 @@
 #include <Arduino.h> 
 #include <SPI.h>
-#define CHIP_SELECT_10
+
 
 int sselect = 10; // the slave pin which is either high (not ready to recieve information) or low ( ready to recieve)
 int  i = 0;
