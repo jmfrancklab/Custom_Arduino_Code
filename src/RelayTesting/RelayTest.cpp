@@ -1,5 +1,5 @@
-#include<Arduino.h>
-#include<SPI.h>
+#include <Arduino.h>
+#include <SPI.h>
 
 int Activator1 = 7;
 int Activator2 = 8;
