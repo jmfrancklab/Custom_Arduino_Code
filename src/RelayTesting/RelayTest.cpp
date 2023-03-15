@@ -1,35 +1,46 @@
+////Made by chat gpt 
+
 #include <Arduino.h>
-#include <SPI.h>
 
-int Activator1 = 7;
-int Activator2 = 8;
+int buttonPin = A0;  // the pin number of the button
+int activator1 = 7;  // the first LED pin number
+int activator2 = 8;  // the second LED pin number
+int led = 4;
+int buttonState = 0;       // variable for storing the button state
+bool heater_is_on = false; // flag for indicating whether the LEDs are on or off
 
-int heating_time = 10000;
-int Butten = A0;
+void setup() {
+  pinMode(buttonPin, INPUT_PULLUP);  // set the button pin as an input with a pull-up resistor
+  pinMode(activator1, OUTPUT);      // set the first LED pin as an output
+  pinMode(activator2, OUTPUT);  
+  pinMode(led,OUTPUT);    // set the second LED pin as an output
 
-
-void setup(){
-
-pinMode(Activator1, OUTPUT);
-pinMode(Activator2,OUTPUT);
-pinMode(Butten, INPUT);
-
-
+  Serial.begin(9600); // initialize serial communication at 9600 bits per second
 }
 
+void loop() {
+  buttonState = digitalRead(buttonPin);  // read the button state
+  if (buttonState == LOW) {              // if the button is pressed
+    Serial.print("Button pressed, state = ");
+    Serial.println(buttonState);
 
-
-void loop(){
-
-Butten = analogRead(Butten);
-if(analogRead(Butten)>1000){
-    digitalWrite(Activator1,HIGH);
-    delay(100);
-    digitalWrite(Activator2,HIGH);
-    delay(20000);
-    digitalWrite(Activator1,LOW);
-    delay(250);
-    digitalWrite(Activator2,LOW);
-    
+    if (!heater_is_on) {                       // and the LEDs are off
+      digitalWrite(activator1, HIGH);       // turn on the first LED
+      digitalWrite(activator2, HIGH);       // turn on the second LED
+      digitalWrite(led,HIGH);
+      heater_is_on = true;                     // set the flag to indicate that the LEDs are on
+      Serial.println("LEDs turned on");
+    } else {                             // otherwise
+      digitalWrite(activator1, LOW);        // turn off the first LED
+      digitalWrite(activator2, LOW);        // turn off the second LED
+      digitalWrite(led,LOW);
+      heater_is_on = false;                    // set the flag to indicate that the LEDs are off
+      Serial.println("LEDs turned off");
     }
+
+    delay(100);                          // debounce the button with a small delay
+  }
 }
+
+
+
