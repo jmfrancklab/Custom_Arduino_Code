@@ -92,7 +92,7 @@ void setup()
 
     digitalWrite(slavecom, LOW);
     SPI.transfer(0);
-    SPI.transfer(19);
+    SPI.transfer(10);
     digitalWrite(slavecom, HIGH);
     // This block turned the led to the right combination
 
@@ -169,10 +169,14 @@ void loop()
                     Serial.print(mydata[k].Voltage);
                     Serial.print(",");
                     Serial.println(mydata[k].time);
+     
                 }
                 num_written = myFile.write((const uint8_t *)mydata, sizeof(mydata)); // Parentheses before variable declares variable
                 Serial.println("wrote a chunk");
                 Serial.println(num_written); // this checks if the data is being written!!  also, we need to know this number to understand how to read it! report this number
+                Serial.println("\nWaiting for Next Data Point Collection Cycle: Hold Button to End Data Collection (Wait Until Teminal (binary data done) is stated");
+                Serial.println("If Unable to Reconnect to the Terminal Hold the Button Down for 30 seconds to halt Data Collection");
+                delay(10000);
 
                 // we're not going to worry about data overflowing -- more measurements means more SNR!
             }
