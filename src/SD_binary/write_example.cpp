@@ -2,6 +2,7 @@
 #include <Arduino.h>
 #include <SPI.h>
 #include <SD.h>
+
 #define SD_CHIP_SELECT_PIN 4
 #define SPI_CHIP_SELECT 10 // Defining the slave pin
 /* This is where  is where I start my addition of the logging code without touching the rest
@@ -17,7 +18,7 @@ int NumCount; // Sets up a number counter to track the amount of times VRead Bef
               //  since you're storing binary, you could maybe just log
               //  continuously (depending on how much data that would generate)
               //  For now, let's leave it how it is, and see how much data is accumulated in a minute.
-float VRec; // This is your average value -- because it comes from a division, let's use a floating point here
+float VRec;   // This is your average value -- because it comes from a division, let's use a floating point here
 
 int numtarget = 10; // The value which is set for the amount of data taken before an accuracy check
                     // don't know what an accuracy check is
@@ -26,6 +27,12 @@ int astore;         // The  value which holds the analog input sum until it is t
                     // floating point number, and each time you acquire data,
                     // add VRead/NumCount
 
+// Pump Mechanics
+int pup = 7;
+int pdown = 6;
+int pcontrol = 3;
+int grace;
+int inter;
 // Eli Response 2/18 : I don't understand your idea
 
 // A structure which two elements
@@ -49,9 +56,50 @@ Datastore mydata[datalen]; // this is the "buffer" -- we want to hold as many da
 int file_is_closed;
 unsigned long int start_time;
 
+
+
+ 
+void Pump_Control(void){
+                grace = millis();
+Serial.println("You may control pump flow");
+
+
+
+
+            while(millis() - grace <= 10000){
+                if(digitalRead(pup) == LOW){ 
+                    if(inter<255){
+                    inter++;
+                    analogWrite(pcontrol,inter);
+                    delay(50);    
+                    }
+                }
+                    if(digitalRead(pdown) == LOW){ 
+                        if(inter>0){
+                            inter --;
+                            analogWrite(pcontrol,inter);
+                            delay(50);    
+                        };
+
+                    ///While holding down the button the value increases 
+
+
+                    }
+            }       
+            Serial.println("Pump Control Secession Over");
+            delay(500);
+
+
+}
+
+
+
+
+
 void setup()
 {
     // Open serial communications and wait for port to open:
+
     Serial.begin(9600);
     digitalWrite(10, HIGH);
 
@@ -90,6 +138,14 @@ void setup()
     pinMode(A2, INPUT);
     pinMode(slavecom, OUTPUT);
 
+    /// Pump Mechanics
+pinMode(7,INPUT_PULLUP);
+pinMode(6,INPUT_PULLUP);
+inter = 1;
+grace = 0;
+ 
+
+
     digitalWrite(slavecom, LOW);
     SPI.transfer(0);
     SPI.transfer(10);
@@ -98,15 +154,28 @@ void setup()
 
     // The serial begin has already been set so I will no do that
     lastButtonPress = millis();
+
+
+    //Setting pump speed
+    Pump_Control();
+    
+
+   
 }
 
 void loop()
 {
+    
     int j, k; //
     int num_written;
-    if (analogRead(A2) > 500) // is the button currently down?
-    { 
-        if (!buttonDown && millis()-lastButtonPress > 1000) // b/c we don't want the following if we're continuously holding down the button
+    
+
+    
+    
+if (analogRead(A2) > 500) // is the button currently down?
+    
+    {
+        if (!buttonDown && millis() - lastButtonPress > 1000) // b/c we don't want the following if we're continuously holding down the button
         {
             buttonToggleState = buttonToggleState ^ true; // flip state of buttonToggleState
             Serial.println("you pressed the button!");
@@ -114,13 +183,17 @@ void loop()
             lastButtonPress = millis();
         }
         buttonDown = true;
-    }else{
-        buttonDown=false;
+    }
+    else
+    {
+        buttonDown = false;
     }
     j = totalDatapointCounter % datalen; // this line does not have to do with fake data -- it's the position of the current datapoint in the "buffer"
 
     if (buttonToggleState && !file_is_closed)
     {
+
+        // The pump module
 
         //// {{{ Serial logging -- this is your code -- I just moved it inside
         ///      the code block that was intended for detection.  It doesn't
@@ -161,6 +234,9 @@ void loop()
             mydata[j].time_short = micros(); // you are not understanding the purpose of the two times -- leave them
             if (totalDatapointCounter > 0 && j == datalen - 1)
             { // write data only once we've filled up mydata
+            
+            
+        
                 for (k = 0; k < datalen; k++)
                 {
                     Serial.print("datapoint: ");
@@ -169,14 +245,14 @@ void loop()
                     Serial.print(mydata[k].Voltage);
                     Serial.print(",");
                     Serial.println(mydata[k].time);
-     
                 }
                 num_written = myFile.write((const uint8_t *)mydata, sizeof(mydata)); // Parentheses before variable declares variable
                 Serial.println("wrote a chunk");
                 Serial.println(num_written); // this checks if the data is being written!!  also, we need to know this number to understand how to read it! report this number
+
                 Serial.println("\nWaiting for Next Data Point Collection Cycle: Hold Button to End Data Collection (Wait Until Teminal (binary data done) is stated");
                 Serial.println("If Unable to Reconnect to the Terminal Hold the Button Down for 30 seconds to halt Data Collection");
-                delay(10000);
+                delay(5000);
 
                 // we're not going to worry about data overflowing -- more measurements means more SNR!
             }
