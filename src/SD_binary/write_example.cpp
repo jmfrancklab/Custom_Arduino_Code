@@ -8,6 +8,9 @@
 /* This is where  is where I start my addition of the logging code without touching the rest
 
 THIS IS ONLY SETTING UP THE VARIABLES*/
+int checker = 8;
+
+
 bool buttonToggleState;
 bool buttonDown;
 unsigned long lastButtonPress;
@@ -252,8 +255,9 @@ if (analogRead(A2) > 500) // is the button currently down?
 
                 Serial.println("\nWaiting for Next Data Point Collection Cycle: Hold Button to End Data Collection (Wait Until Teminal (binary data done) is stated");
                 Serial.println("If Unable to Reconnect to the Terminal Hold the Button Down for 30 seconds to halt Data Collection");
+                digitalWrite(8,HIGH);
                 delay(5000);
-
+                digitalWrite(8,LOW);
                 // we're not going to worry about data overflowing -- more measurements means more SNR!
             }
         }
