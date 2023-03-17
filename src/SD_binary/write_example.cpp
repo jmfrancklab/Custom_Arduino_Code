@@ -11,6 +11,8 @@ THIS IS ONLY SETTING UP THE VARIABLES*/
 int checker = 8;
 
 
+unsigned long int lastlog;
+unsigned long int log_interval = 1;// log every minute
 bool buttonToggleState;
 bool buttonDown;
 unsigned long lastButtonPress;
@@ -50,6 +52,7 @@ struct Datastore
 };
 
 File myFile;
+File logFile;
 // note that I renamed totalDatapointCounter to totalDatapointCounter, since it represents the total number of (averaged) datapoints that we've stored
 int totalDatapointCounter; // I had thought about making this long, but if we do that, and do math with regular numbers, everything goes crazy!
 const int datalen = 10;    // So ten data points will be stored at a time? 2/18/ --Eli Paster JF answers -- YES! but we can increase the size of this buffer just by changing this number
@@ -163,7 +166,7 @@ grace = 0;
     //Setting pump speed
     Pump_Control();
     
-
+    lastlog = 0;
    
 }
 
@@ -172,9 +175,23 @@ void loop()
     
     int j, k; //
     int num_written;
-    
+    if(millis()/log_interval > lastlog+1){
+        logFile = SD.open("log.txt", FILE_WRITE);
+        logFile.seek(EOF);// go to end of file to append
+        logFile.print("\neverything is running!\nat millis:");
+        logFile.print(millis());
+        logFile.print("\nbuttonDown ");
+        logFile.print(buttonDown);
+        logFile.print("\nfile_is_closed ");
+        logFile.print(file_is_closed);
+        logFile.print("\ntotalDatapointCounter ");
+        logFile.print(totalDatapointCounter);
+        logFile.print("\position within datafile ");
+        logFile.print(myFile.position());
+        logFile.close();
+        lastlog = millis() / log_interval;
+    }
 
-    
     
 if (analogRead(A2) > 500) // is the button currently down?
     
