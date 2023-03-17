@@ -2,12 +2,11 @@
  * Rui Santos
  * Complete Project Details https://randomnerdtutorials.com
 */
-
-
 #include <Arduino.h>
 #include <SPI.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
+
 
 // Data wire is plugged into port 4 on the Arduino
 #define ONE_WIRE_BUS 4
