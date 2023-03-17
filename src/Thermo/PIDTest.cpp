@@ -1,92 +1,32 @@
-/*
- * Rui Santos
- * Complete Project Details https://randomnerdtutorials.com
-*/
-#include <Arduino.h>
-#include <SPI.h>
+/* Arduino DS18B20 temp sensor tutorial
+   More info: http://www.ardumotive.com/how-to-use-the-ds18b20-temperature-sensor-en.html
+   Date: 19/6/2015 // www.ardumotive.com */
+
+
+//Include libraries
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
-
-// Data wire is plugged into port 4 on the Arduino
-#define ONE_WIRE_BUS 4
+// Data wire is plugged into pin 2 on the Arduino
+#define ONE_WIRE_BUS 2
 // Setup a oneWire instance to communicate with any OneWire devices (not just Maxim/Dallas temperature ICs)
 OneWire oneWire(ONE_WIRE_BUS);
-
 // Pass our oneWire reference to Dallas Temperature. 
 DallasTemperature sensors(&oneWire);
 
-int numberOfDevices; // Number of temperature devices found
-
-DeviceAddress tempDeviceAddress; // We'll use this variable to store a found device address
-
-// function to print a device address
-void printAddress(DeviceAddress deviceAddress) {
-  for (uint8_t i = 0; i < 8; i++) {
-    if (deviceAddress[i] < 16) Serial.print("0");
-      Serial.print(deviceAddress[i]);
-  }
-}
-
-
-
-
-void setup(void) {
-  // start serial port
-  Serial.begin(9600);
-  
-  // Start up the library
+void setup(void)
+{
+  Serial.begin(9600); //Begin serial communication
+  Serial.println("Arduino Digital Temperature // Serial Monitor Version"); //Print a message
   sensors.begin();
-  
-  // Grab a count of devices on the wire
-  numberOfDevices = sensors.getDeviceCount();
-  
-  // locate devices on the bus
-  Serial.print("Locating devices...");
-  Serial.print("Found ");
-  Serial.print(numberOfDevices);
-  Serial.println(" devices.");
-
-  // Loop through each device, print out address
-  for(int i=0;i<numberOfDevices; i++) {
-    // Search the wire for address
-    if(sensors.getAddress(tempDeviceAddress, i)) {
-      Serial.print("Found device ");
-      Serial.print(i);
-      Serial.print(" with address: ");
-      printAddress(tempDeviceAddress);
-      Serial.println();
-		} else {
-		  Serial.print("Found ghost device at ");
-		  Serial.print(i);
-		  Serial.print(" but could not detect address. Check power and cabling");
-		}
-  }
 }
 
-void loop(void) { 
-  sensors.requestTemperatures(); // Send the command to get temperatures
-  
-  // Loop through each device, print out temperature data
-  for(int i=0;i<numberOfDevices; i++) {
-    // Search the wire for address
-    if(sensors.getAddress(tempDeviceAddress, i)){
-		
-		// Output the device ID
-		Serial.print("Temperature for device: ");
-		Serial.println(i);
-
-    // Print the data
-    float tempC = sensors.getTempC(tempDeviceAddress);
-    Serial.print("Temp C: ");
-    Serial.print(tempC);
-    Serial.print(" Temp F: ");
-    Serial.println(DallasTemperature::toFahrenheit(tempC)); // Converts tempC to Fahrenheit
-    } 	
-  }
-  delay(5000);
+void loop(void)
+{ 
+  // Send the command to get temperatures
+  sensors.requestTemperatures();  
+  Serial.print("Temperature is: ");
+  Serial.println(sensors.getTempCByIndex(1)); // Why "byIndex"? You can have more than one IC on the same bus. 0 refers to the first IC on the wire
+  //Update value every 1 sec.
+  delay(1000);
 }
-
-
-
-
