@@ -12,7 +12,7 @@ int checker = 8;
 
 
 unsigned long int lastlog;
-unsigned long int log_interval = 1;// log every minute
+unsigned long int log_interval = 1000;// log every minute
 bool buttonToggleState;
 bool buttonDown;
 unsigned long lastButtonPress;
@@ -178,16 +178,16 @@ void loop()
     if(millis()/log_interval > lastlog+1){
         logFile = SD.open("log.txt", FILE_WRITE);
         logFile.seek(EOF);// go to end of file to append
-        logFile.print("\neverything is running!\nat millis:");
-        logFile.print(millis());
-        logFile.print("\nbuttonDown ");
-        logFile.print(buttonDown);
-        logFile.print("\nfile_is_closed ");
-        logFile.print(file_is_closed);
-        logFile.print("\ntotalDatapointCounter ");
-        logFile.print(totalDatapointCounter);
-        logFile.print("\position within datafile ");
-        logFile.print(myFile.position());
+        logFile.println("\neverything is running!\nat millis:");
+        logFile.println(millis());
+        logFile.println("\nbuttonDown ");
+        logFile.println(buttonDown);
+        logFile.println("\nfile_is_closed ");
+        logFile.println(file_is_closed);
+        logFile.println("\ntotalDatapointCounter ");
+        logFile.println(totalDatapointCounter);
+        logFile.println("\nposition within datafile ");
+        logFile.println(myFile.position());
         logFile.close();
         lastlog = millis() / log_interval;
     }
