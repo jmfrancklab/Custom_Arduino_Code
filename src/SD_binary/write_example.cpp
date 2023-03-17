@@ -144,6 +144,7 @@ void setup()
     /// Pump Mechanics
 pinMode(7,INPUT_PULLUP);
 pinMode(6,INPUT_PULLUP);
+pinMode(8,OUTPUT);
 inter = 1;
 grace = 0;
  
