@@ -185,7 +185,9 @@ void loop()
         logFile.print(file_is_closed);
         logFile.print("\ntotalDatapointCounter ");
         logFile.print(totalDatapointCounter);
-        logFile.close()
+        logFile.print("\position within datafile ");
+        logFile.print(myFile.position());
+        logFile.close();
         lastlog = millis() / log_interval;
     }
 
