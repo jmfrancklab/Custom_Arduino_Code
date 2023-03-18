@@ -12,7 +12,7 @@ int checker = 8;
 
 
 unsigned long int lastlog;
-unsigned long int log_interval = 1;// log every minute
+unsigned long int log_interval = 1000;// log every minute
 bool buttonToggleState;
 bool buttonDown;
 unsigned long lastButtonPress;
@@ -59,7 +59,7 @@ const int datalen = 10;    // So ten data points will be stored at a time? 2/18/
 char *filename = "test.dat";
 Datastore mydata[datalen]; // this is the "buffer" -- we want to hold as many datapoints in memory as possible, since writing to disk is the slow step
 
-int file_is_closed;
+int halter = 0;
 unsigned long int start_time;
 
 
@@ -125,7 +125,7 @@ void setup()
     }
     totalDatapointCounter = 0; // This is the total number of datapoints that have been acquired
     start_time = millis();
-    file_is_closed = 0; // this is a logical variable that tells us whether or not our acquisition is done.  Once file_is_closed is 1, acquisition stops.  I changed the name to better reflect what it's for.
+    halter = 0; // this is a logical variable that tells us whether or not our acquisition is done.  Once file_is_closed is 1, acquisition stops.  I changed the name to better reflect what it's for.
     // Open once, at the beginning
     myFile = SD.open(filename, FILE_WRITE); // Making an iterator which stores an instance to access the file class SHOULD LEARN MORE ABOUT AN INSTANCE
     // since this is inside the setup() function, I indent it for readability
@@ -147,6 +147,7 @@ void setup()
     /// Pump Mechanics
 pinMode(7,INPUT_PULLUP);
 pinMode(6,INPUT_PULLUP);
+pinMode(8,OUTPUT);
 inter = 1;
 grace = 0;
  
@@ -177,16 +178,16 @@ void loop()
     if(millis()/log_interval > lastlog+1){
         logFile = SD.open("log.txt", FILE_WRITE);
         logFile.seek(EOF);// go to end of file to append
-        logFile.print("\neverything is running!\nat millis:");
-        logFile.print(millis());
-        logFile.print("\nbuttonDown ");
-        logFile.print(buttonDown);
-        logFile.print("\nfile_is_closed ");
-        logFile.print(file_is_closed);
-        logFile.print("\ntotalDatapointCounter ");
-        logFile.print(totalDatapointCounter);
-        logFile.print("\position within datafile ");
-        logFile.print(myFile.position());
+        logFile.println("\neverything is running!\nat millis:");
+        logFile.println(millis());
+        logFile.println("\nbuttonDown ");
+        logFile.println(buttonDown);
+        logFile.println("\nfile_is_closed ");
+        logFile.println(halter);
+        logFile.println("\ntotalDatapointCounter ");
+        logFile.println(totalDatapointCounter);
+        logFile.println("\nposition within datafile ");
+        logFile.println(myFile.position());
         logFile.close();
         lastlog = millis() / log_interval;
     }
@@ -210,7 +211,7 @@ if (analogRead(A2) > 500) // is the button currently down?
     }
     j = totalDatapointCounter % datalen; // this line does not have to do with fake data -- it's the position of the current datapoint in the "buffer"
 
-    if (buttonToggleState && !file_is_closed)
+    if (buttonToggleState && !halter)
     {
 
         // The pump module
@@ -266,10 +267,11 @@ if (analogRead(A2) > 500) // is the button currently down?
                     Serial.print(",");
                     Serial.println(mydata[k].time);
                 }
+                myFile.seek(EOF);// go to end of file to append
                 num_written = myFile.write((const uint8_t *)mydata, sizeof(mydata)); // Parentheses before variable declares variable
                 Serial.println("wrote a chunk");
                 Serial.println(num_written); // this checks if the data is being written!!  also, we need to know this number to understand how to read it! report this number
-
+                myFile.close(); //Closing the file to check since log did not tell us anything
                 Serial.println("\nWaiting for Next Data Point Collection Cycle: Hold Button to End Data Collection (Wait Until Teminal (binary data done) is stated");
                 Serial.println("If Unable to Reconnect to the Terminal Hold the Button Down for 30 seconds to halt Data Collection");
                 digitalWrite(8,HIGH);
@@ -279,11 +281,11 @@ if (analogRead(A2) > 500) // is the button currently down?
             }
         }
     }
-    else if (totalDatapointCounter > 0 && !file_is_closed)
+    else if (totalDatapointCounter > 0 && !halter)
     { // Single "&" is pointer converter double and is logical "and" operator
         // This means we're done, so go ahead and close the file
         Serial.println("binary data done");
-        file_is_closed = 1; // Assuing a logical operator
+        halter = 1; // Assuing a logical operator
         myFile.close();
     }
 }

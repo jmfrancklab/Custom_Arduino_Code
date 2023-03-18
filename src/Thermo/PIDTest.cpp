@@ -1,92 +1,103 @@
-/*
- * Rui Santos
- * Complete Project Details https://randomnerdtutorials.com
-*/
-#include <Arduino.h>
-#include <SPI.h>
+//Include libraries
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
 
-// Data wire is plugged into port 4 on the Arduino
-#define ONE_WIRE_BUS 4
-// Setup a oneWire instance to communicate with any OneWire devices (not just Maxim/Dallas temperature ICs)
-OneWire oneWire(ONE_WIRE_BUS);
+//This code sets the sensors and congifures them
+#define DS18B20 8
 
-// Pass our oneWire reference to Dallas Temperature. 
-DallasTemperature sensors(&oneWire);
+//The activators for our relay and the heating time
+int Activator1 = 4;
+int Activator2 = 6;
+int Heatime = 10000;
+double tolorance =10;
+double temptarget = 30.45;
+bool heater_on = false;
 
-int numberOfDevices; // Number of temperature devices found
+//PD Controls
 
-DeviceAddress tempDeviceAddress; // We'll use this variable to store a found device address
+double Kp = 7;
+double Kd = 7;
 
-// function to print a device address
-void printAddress(DeviceAddress deviceAddress) {
-  for (uint8_t i = 0; i < 8; i++) {
-    if (deviceAddress[i] < 16) Serial.print("0");
-      Serial.print(deviceAddress[i]);
-  }
+//Configurating the Temperature sensing
+OneWire bus(DS18B20);
+DallasTemperature sensors(&bus);
+
+double gettemp(void){
+
+  sensors.requestTemperatures();  
+  double T1 = sensors.getTempCByIndex(0);
+  double T2 = sensors.getTempCByIndex(1);
+  double Tf = (T1+T2)/2;
+  return Tf;
+//Taking 2 temperature reading and then averaging them
+}
+
+double Proportional(){
+
+  double ontimeProp = (Heatime/2) + ((Kp*(gettemp() - temptarget))/temptarget)*(Heatime/2);
+  // This calculates the residual of the amount of time it will stay on for one time vs off 
+
+  return ontimeProp;
+
+}
+
+double derivitive(){
+
+  double timei = millis();
+  double Ti = gettemp();
+  delay(50);
+  double Tf = gettemp();
+  double timef = millis();
+  double ontimeDer = (Heatime/2) + ((Kd*(Tf-Ti)/(timef-timei))*(Heatime/2)); // The derivitive Term
+
+  return ontimeDer;
+
+}
+
+void preheat(void){
+  heater_on = true;
+
+if(heater_on = true){
+digitalWrite(Activator1,HIGH);
+digitalWrite(Activator2,HIGH);
+}
+
+while( gettemp()< temptarget){
+heater_on = true;
+}
+heater_on = false;
+
+if(!heater_on){
+digitalWrite(Activator1,LOW);
+digitalWrite(Activator2,LOW);
+}
 }
 
 
-
-
-void setup(void) {
-  // start serial port
-  Serial.begin(9600);
-  
-  // Start up the library
+void setup()
+{
+  //Begining necessary packages
+  Serial.begin(9600); 
   sensors.begin();
-  
-  // Grab a count of devices on the wire
-  numberOfDevices = sensors.getDeviceCount();
-  
-  // locate devices on the bus
-  Serial.print("Locating devices...");
-  Serial.print("Found ");
-  Serial.print(numberOfDevices);
-  Serial.println(" devices.");
+// Making Pinmodes
+  pinMode(Activator1, OUTPUT);
+  pinMode(Activator2,OUTPUT);
+  preheat();
 
-  // Loop through each device, print out address
-  for(int i=0;i<numberOfDevices; i++) {
-    // Search the wire for address
-    if(sensors.getAddress(tempDeviceAddress, i)) {
-      Serial.print("Found device ");
-      Serial.print(i);
-      Serial.print(" with address: ");
-      printAddress(tempDeviceAddress);
-      Serial.println();
-		} else {
-		  Serial.print("Found ghost device at ");
-		  Serial.print(i);
-		  Serial.print(" but could not detect address. Check power and cabling");
-		}
-  }
-}
 
-void loop(void) { 
-  sensors.requestTemperatures(); // Send the command to get temperatures
-  
-  // Loop through each device, print out temperature data
-  for(int i=0;i<numberOfDevices; i++) {
-    // Search the wire for address
-    if(sensors.getAddress(tempDeviceAddress, i)){
-		
-		// Output the device ID
-		Serial.print("Temperature for device: ");
-		Serial.println(i);
-
-    // Print the data
-    float tempC = sensors.getTempC(tempDeviceAddress);
-    Serial.print("Temp C: ");
-    Serial.print(tempC);
-    Serial.print(" Temp F: ");
-    Serial.println(DallasTemperature::toFahrenheit(tempC)); // Converts tempC to Fahrenheit
-    } 	
-  }
-  delay(5000);
 }
 
 
+
+
+
+
+
+
+void loop()
+{ 
+
+}
 
 
