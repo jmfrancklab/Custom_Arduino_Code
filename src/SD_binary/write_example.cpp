@@ -60,7 +60,7 @@ const int datalen = 10;    // So ten data points will be stored at a time? 2/18/
 char *filename = "test.dat";
 Datastore mydata[datalen]; // this is the "buffer" -- we want to hold as many datapoints in memory as possible, since writing to disk is the slow step
 
-int halter = 0;
+int halter; // do not set the value when declaring -- that's what you do for constants
 unsigned long int start_time;
 
 
@@ -149,7 +149,7 @@ void setup()
     /// Pump Mechanics
 pinMode(7,INPUT_PULLUP);
 pinMode(6,INPUT_PULLUP);
-pinMode(8,OUTPUT);
+pinMode(8,OUTPUT); // is this the LED pin?
 inter = 1;
 grace = 0;
  
@@ -272,11 +272,11 @@ if (analogRead(A2) > 500) // is the button currently down?
                     Serial.print(",");
                     Serial.println(mydata[k].time);
                 }
-                myFile.seek(EOF);// go to end of file to append
                 num_written = myFile.write((const uint8_t *)mydata, sizeof(mydata)); // Parentheses before variable declares variable
                 Serial.println("wrote a chunk");
                 Serial.println(num_written); // this checks if the data is being written!!  also, we need to know this number to understand how to read it! report this number
-                myFile.close(); //Closing the file to check since log did not tell us anything
+                // JF removed lines to close file here -- closing and reopening is inefficient, and I don't think is going to help much
+                // if we want to prioritize data "safety" then it's better to write a series of datafiles
                 Serial.println("\nWaiting for Next Data Point Collection Cycle: Hold Button to End Data Collection (Wait Until Teminal (binary data done) is stated");
                 Serial.println("If Unable to Reconnect to the Terminal Hold the Button Down for 30 seconds to halt Data Collection");
                 digitalWrite(8,HIGH);
