@@ -1,32 +1,81 @@
-/* Arduino DS18B20 temp sensor tutorial
-   More info: http://www.ardumotive.com/how-to-use-the-ds18b20-temperature-sensor-en.html
-   Date: 19/6/2015 // www.ardumotive.com */
-
-
 //Include libraries
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
-// Data wire is plugged into pin 2 on the Arduino
-#define ONE_WIRE_BUS 2
-// Setup a oneWire instance to communicate with any OneWire devices (not just Maxim/Dallas temperature ICs)
-OneWire oneWire(ONE_WIRE_BUS);
-// Pass our oneWire reference to Dallas Temperature. 
-DallasTemperature sensors(&oneWire);
 
-void setup(void)
+//This code sets the sensors and congifures them
+#define DS18B20 8
+
+//The activators for our relay and the heating time
+int Activator1 = 4;
+int Activator2 = 6;
+int Heatime = 10000;
+double tolorance =10;
+double temptarget = 30.45;
+
+//PD Controls
+
+double Kp = 7;
+double Kd = 7;
+
+//Configurating the Temperature sensing
+OneWire bus(DS18B20);
+DallasTemperature sensors(&bus);
+
+
+void setup()
 {
-  Serial.begin(9600); //Begin serial communication
-  Serial.println("Arduino Digital Temperature // Serial Monitor Version"); //Print a message
+  //Begining necessary packages
+  Serial.begin(9600); 
   sensors.begin();
+// Making Pinmodes
+  pinMode(Activator1, OUTPUT);
+  pinMode(Activator2,OUTPUT);
 }
 
-void loop(void)
-{ 
-  // Send the command to get temperatures
+
+double gettemp(void){
+
   sensors.requestTemperatures();  
-  Serial.print("Temperature is: ");
-  Serial.println(sensors.getTempCByIndex(1)); // Why "byIndex"? You can have more than one IC on the same bus. 0 refers to the first IC on the wire
-  //Update value every 1 sec.
-  delay(1000);
+  double T1 = sensors.getTempCByIndex(0);
+  double T2 = sensors.getTempCByIndex(1);
+  double Tf = (T1+T2)/2;
+  return Tf;
+//Taking 2 temperature reading and then averaging them
+}
+
+double Proportional(){
+
+  double ontimeProp = (Heatime/2) + ((Kp*(gettemp() - temptarget))/temptarget)*(Heatime/2);
+  // This calculates the residual of the amount of time it will stay on for one time vs off 
+
+  return ontimeProp;
+
+}
+
+double derivitive(){
+
+  double timei = millis();
+  double Ti = gettemp();
+  delay(50);
+  double Tf = gettemp();
+  double timef = millis();
+  double ontimeDer = (Heatime/2) + ((Kd*(Tf-Ti)/(timef-timei))*(Heatime/2)); // The derivitive Term
+
+  return ontimeDer;
+
+}
+
+
+
+
+
+
+
+void loop()
+{ 
+
+
+
+
 }
