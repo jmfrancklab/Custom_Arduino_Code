@@ -12,6 +12,7 @@ int Activator2 = 6;
 int Heatime = 10000;
 double tolorance =10;
 double temptarget = 30.45;
+bool heater_on = false;
 
 //PD Controls
 
@@ -21,18 +22,6 @@ double Kd = 7;
 //Configurating the Temperature sensing
 OneWire bus(DS18B20);
 DallasTemperature sensors(&bus);
-
-
-void setup()
-{
-  //Begining necessary packages
-  Serial.begin(9600); 
-  sensors.begin();
-// Making Pinmodes
-  pinMode(Activator1, OUTPUT);
-  pinMode(Activator2,OUTPUT);
-}
-
 
 double gettemp(void){
 
@@ -66,6 +55,40 @@ double derivitive(){
 
 }
 
+void preheat(void){
+  heater_on = true;
+
+if(heater_on = true){
+digitalWrite(Activator1,HIGH);
+digitalWrite(Activator2,HIGH);
+}
+
+while( gettemp()< temptarget){
+heater_on = true;
+}
+heater_on = false;
+
+if(!heater_on){
+digitalWrite(Activator1,LOW);
+digitalWrite(Activator2,LOW);
+}
+}
+
+
+void setup()
+{
+  //Begining necessary packages
+  Serial.begin(9600); 
+  sensors.begin();
+// Making Pinmodes
+  pinMode(Activator1, OUTPUT);
+  pinMode(Activator2,OUTPUT);
+  preheat();
+
+
+}
+
+
 
 
 
@@ -75,7 +98,6 @@ double derivitive(){
 void loop()
 { 
 
-
-
-
 }
+
+
