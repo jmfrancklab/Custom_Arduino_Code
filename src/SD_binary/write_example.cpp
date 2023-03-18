@@ -55,6 +55,7 @@ File myFile;
 File logFile;
 // note that I renamed totalDatapointCounter to totalDatapointCounter, since it represents the total number of (averaged) datapoints that we've stored
 int totalDatapointCounter; // I had thought about making this long, but if we do that, and do math with regular numbers, everything goes crazy!
+int totalDatapointCounterRollover; // we limit previous to 10,000 and then increment this when it rolls over
 const int datalen = 10;    // So ten data points will be stored at a time? 2/18/ --Eli Paster JF answers -- YES! but we can increase the size of this buffer just by changing this number
 char *filename = "test.dat";
 Datastore mydata[datalen]; // this is the "buffer" -- we want to hold as many datapoints in memory as possible, since writing to disk is the slow step
@@ -124,6 +125,7 @@ void setup()
         SD.remove(filename); // Remove the file to stop weird confusing
     }
     totalDatapointCounter = 0; // This is the total number of datapoints that have been acquired
+    totalDatapointCounterRollover = 0; // This is the total number of datapoints that have been acquired
     start_time = millis();
     halter = 0; // this is a logical variable that tells us whether or not our acquisition is done.  Once file_is_closed is 1, acquisition stops.  I changed the name to better reflect what it's for.
     // Open once, at the beginning
@@ -178,14 +180,16 @@ void loop()
     if(millis()/log_interval > lastlog+1){
         logFile = SD.open("log.txt", FILE_WRITE);
         logFile.seek(EOF);// go to end of file to append
-        logFile.println("\neverything is running!\nat millis:");
-        logFile.println(millis());
+        logFile.println("\neverything is running! current arduino time (min):");
+        logFile.println((float) millis()/(float) 60000);
         logFile.println("\nbuttonDown ");
         logFile.println(buttonDown);
         logFile.println("\nfile_is_closed ");
         logFile.println(halter);
         logFile.println("\ntotalDatapointCounter ");
-        logFile.println(totalDatapointCounter);
+        logFile.print(totalDatapointCounter);
+        logFile.print(" totalDatapointCounterRollover ");
+        logFile.print(totalDatapointCounterRollover);
         logFile.println("\nposition within datafile ");
         logFile.println(myFile.position());
         logFile.close();
@@ -235,8 +239,9 @@ if (analogRead(A2) > 500) // is the button currently down?
             // the file that reads the structure.
             NumCount = 0;
             totalDatapointCounter += 1; // increment this here, since if we're averaging, we only want a new datapoint for every averaged point that we generate
-            if (totalDatapointCounter > 50000 && totalDatapointCounter % datalen == 0)
+            if (totalDatapointCounter > 10000 && totalDatapointCounter % datalen == 0)
             {
+				totalDatapointCounterRollover += 1;
                 totalDatapointCounter = 0; // prevent overflow by rolling over
             }
             astore = 0;
