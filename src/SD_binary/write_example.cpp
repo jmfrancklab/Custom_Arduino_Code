@@ -2,13 +2,118 @@
 #include <Arduino.h>
 #include <SPI.h>
 #include <SD.h>
+#include <OneWire.h>
+#include <DallasTemperature.h>
 
 #define SD_CHIP_SELECT_PIN 4
-#define SPI_CHIP_SELECT 10 // Defining the slave pin
-/* This is where  is where I start my addition of the logging code without touching the rest
+#define SPI_CHIP_SELECT 53 // Defining the slave pin
+#define ONE_WIRE_BUS 45 // Data wire is plugged into digital pin 2 on the Arduino
 
-THIS IS ONLY SETTING UP THE VARIABLES*/
-int checker = 8;
+
+// Setup a oneWire instance to communicate with any OneWire device
+OneWire oneWire(ONE_WIRE_BUS);	
+
+// Pass oneWire reference to DallasTemperature library
+DallasTemperature sensors(&oneWire);
+
+
+int deviceCount = 0;
+float tempC;
+float ttar = 40;
+float tolorance = 4;
+float t_max = ttar + tolorance;
+float t_min = ttar -tolorance;
+
+
+// The relay activators; and heat controllers 
+int activator1 = 27;
+int activator2 = 26;
+bool heater_on = false; //Heater starts of not on
+bool hit_max = false; // Has not entered max of min yet 
+bool hit_min = false; 
+
+int checker = 44; //The data recording led checker
+int slavecom = 53; // The SC Select pin 
+
+//pump mechanics
+int pup = 37;
+int pdown = 39;
+int pcontrol = 3;
+int grace;
+int inter;
+
+
+void device_checker (){
+
+  Serial.print("Locating devices...");
+  Serial.print("Found ");
+  deviceCount = sensors.getDeviceCount();
+  Serial.print(deviceCount, DEC);
+  Serial.println(" devices.");
+  Serial.println("");
+}
+float average_C(){
+  sensors.requestTemperatures();
+  float a= sensors.getTempCByIndex(0);
+  float b= sensors.getTempCByIndex(1);
+  return  float(a+b)/2;  
+//Look up how to have a value continually sum with a for loop
+}
+void heatsetup(){
+
+digitalWrite(activator1,HIGH);
+digitalWrite(activator2,HIGH);
+
+while(average_C() < ttar){
+delay(50);
+Serial.println(average_C());
+
+}
+Serial.print("ttar is ");
+Serial.println(ttar);
+Serial.print("Real Temp is ");
+Serial.print(average_C());
+
+}
+void temp_stabilizer(){
+  if(average_C()>= t_max && !hit_max){
+    digitalWrite(activator1,LOW);
+    digitalWrite(activator2,LOW);
+    hit_max = true;
+    hit_min = false;
+  } else if( average_C()<= t_min && !hit_min){
+    digitalWrite(activator1,HIGH);
+    digitalWrite(activator2,HIGH);
+    hit_min = true;
+    hit_max = false;
+  } 
+}
+void Pump_Control(void){
+                grace = millis();
+Serial.println("You may control pump flow");
+            while(millis() - grace <= 10000){
+                if(digitalRead(pup) == LOW){ 
+                    if(inter<255){
+                    inter++;
+                    analogWrite(pcontrol,inter);
+                    delay(50);    
+                    }
+                }
+                    if(digitalRead(pdown) == LOW){ 
+                        if(inter>0){
+                            inter --;
+                            analogWrite(pcontrol,inter);
+                            delay(50);    
+                        }
+                    ///While holding down the button the value increases 
+                    }
+            }       
+            Serial.println("Pump Control Secession Over");
+            delay(500);
+
+
+}
+
 
 
 unsigned long int lastlog;
@@ -16,7 +121,6 @@ unsigned long int log_interval = 1000;// log every minute
 bool buttonToggleState;
 bool buttonDown;
 unsigned long lastButtonPress;
-int slavecom = 10;
 int VRead;    // Sets up a reader for Analog Voltage Reading to A0
 int NumCount; // Sets up a number counter to track the amount of times VRead Before Averaging it
               //  note that you don't necessarily need to average any more --
@@ -24,7 +128,7 @@ int NumCount; // Sets up a number counter to track the amount of times VRead Bef
               //  continuously (depending on how much data that would generate)
               //  For now, let's leave it how it is, and see how much data is accumulated in a minute.
 float VRec;   // This is your average value -- because it comes from a division, let's use a floating point here
-
+float T_Rec = 0;
 int numtarget = 10; // The value which is set for the amount of data taken before an accuracy check
                     // don't know what an accuracy check is
 int astore;         // The  value which holds the analog input sum until it is time to dump the average
@@ -32,13 +136,7 @@ int astore;         // The  value which holds the analog input sum until it is t
                     // floating point number, and each time you acquire data,
                     // add VRead/NumCount
 
-// Pump Mechanics
-int pup = 7;
-int pdown = 6;
-int pcontrol = 3;
-int grace;
-int inter;
-// Eli Response 2/18 : I don't understand your idea
+
 
 // A structure which two elements
 struct Datastore
@@ -47,8 +145,10 @@ struct Datastore
     // make sure that you match the type of the data that you're trying to
     // store!!
     float Voltage;                // this should just be a raw arduino reading DO NOT DO THE OD MATH ON THE ARDUINO!!!
+    float Temp_C;
     unsigned long int time;       // similarly, just the result of millis
     unsigned long int time_short; // What is the purpose of this JF answers -- to get more accurate time!
+
 };
 
 File myFile;
@@ -64,51 +164,30 @@ int halter; // do not set the value when declaring -- that's what you do for con
 unsigned long int start_time;
 
 
-
- 
-void Pump_Control(void){
-                grace = millis();
-Serial.println("You may control pump flow");
-
-
-
-
-            while(millis() - grace <= 10000){
-                if(digitalRead(pup) == LOW){ 
-                    if(inter<255){
-                    inter++;
-                    analogWrite(pcontrol,inter);
-                    delay(50);    
-                    }
-                }
-                    if(digitalRead(pdown) == LOW){ 
-                        if(inter>0){
-                            inter --;
-                            analogWrite(pcontrol,inter);
-                            delay(50);    
-                        };
-
-                    ///While holding down the button the value increases 
-
-
-                    }
-            }       
-            Serial.println("Pump Control Secession Over");
-            delay(500);
-
-
-}
-
-
-
-
-
 void setup()
 {
-    // Open serial communications and wait for port to open:
+   
+pinMode(A0, INPUT);
+pinMode(A2, INPUT);
+pinMode(slavecom, OUTPUT);
+pinMode(10,OUTPUT);
+digitalWrite(10,HIGH); //This may have caused SD problems
 
+/// Pump Mechanics
+pinMode(pup,INPUT_PULLUP);
+pinMode(pdown,INPUT_PULLUP);
+pinMode(pcontrol,OUTPUT);
+inter = 1;
+lastlog = 0;
+// Heater Mechancis
+pinMode(activator1,OUTPUT);
+pinMode(activator2,OUTPUT);
+
+
+    
     Serial.begin(9600);
-    digitalWrite(10, HIGH);
+    sensors.begin();	// Start up the library
+    digitalWrite(slavecom, HIGH);// Keeping the digipot out of the way of the SD code
 
     Serial.print("Initializing SD card...");
 
@@ -140,35 +219,17 @@ void setup()
     astore = 0;                // The consectutive reading of the analog will be added here and then divided once the numcount reaches its target
     buttonToggleState = false; // button has not been pressed
     buttonDown = false;        // button actively being pressed
-    // Setting the pin modes
 
-    pinMode(A0, INPUT);
-    pinMode(A2, INPUT);
-    pinMode(slavecom, OUTPUT);
-
-    /// Pump Mechanics
-pinMode(7,INPUT_PULLUP);
-pinMode(6,INPUT_PULLUP);
-pinMode(8,OUTPUT); // is this the LED pin?
-inter = 1;
-grace = 0;
- 
-
-
-    digitalWrite(slavecom, LOW);
+digitalWrite(slavecom, LOW);
     SPI.transfer(0);
-    SPI.transfer(10);
-    digitalWrite(slavecom, HIGH);
-    // This block turned the led to the right combination
+    SPI.transfer(200);
+    digitalWrite(slavecom, HIGH); ///Setting up intensity of the light will be modified eventually
 
-    // The serial begin has already been set so I will no do that
-    lastButtonPress = millis();
+device_checker();
+heatsetup();
+Pump_Control();
 
-
-    //Setting pump speed
-    Pump_Control();
-    
-    lastlog = 0;
+lastButtonPress = millis();
    
 }
 
@@ -218,27 +279,20 @@ if (analogRead(A2) > 500) // is the button currently down?
     if (buttonToggleState && !halter)
     {
 
-        // The pump module
-
-        //// {{{ Serial logging -- this is your code -- I just moved it inside
-        ///      the code block that was intended for detection.  It doesn't
-        ///      make sense for this to be in an outer block -- you want the
-        ///      actual acquisition to replace the fake data!
-
-        // Now starting the edit to the serial logging
-
+        
         VRead = analogRead(A0); // VRead is an integer, so it doesn't make sense to cast to a float!
+
         astore += VRead;
         NumCount += 1;
 
         if (NumCount == numtarget)
-        {
-            VRec = (float)astore / (float)numtarget; // Calculating the average of the given data
-            // previous converted to a floating point, otherwise you are losing accuracy.
-            // this does meant that we will need to change the structure and
-            // the file that reads the structure.
+        {   // Calls the value of the function
+            VRec = (float)astore / (float)numtarget; 
+            
             NumCount = 0;
             totalDatapointCounter += 1; // increment this here, since if we're averaging, we only want a new datapoint for every averaged point that we generate
+            
+            
             if (totalDatapointCounter > 10000 && totalDatapointCounter % datalen == 0)
             {
 				totalDatapointCounterRollover += 1;
@@ -256,8 +310,10 @@ if (analogRead(A2) > 500) // is the button currently down?
             // averaged points to the binary data, so all the stuff below would
             // be added to this block, here.
             mydata[j].Voltage = VRec; // Attempting to actually log data
+            mydata[j].Temp_C = average_C();
             mydata[j].time = millis();
             mydata[j].time_short = micros(); // you are not understanding the purpose of the two times -- leave them
+            
             if (totalDatapointCounter > 0 && j == datalen - 1)
             { // write data only once we've filled up mydata
             
@@ -271,6 +327,8 @@ if (analogRead(A2) > 500) // is the button currently down?
                     Serial.print(mydata[k].Voltage);
                     Serial.print(",");
                     Serial.println(mydata[k].time);
+                    Serial.print(",");
+                    Serial.print(mydata[k].Temp_C);
                 }
                 num_written = myFile.write((const uint8_t *)mydata, sizeof(mydata)); // Parentheses before variable declares variable
                 Serial.println("wrote a chunk");
@@ -279,9 +337,11 @@ if (analogRead(A2) > 500) // is the button currently down?
                 // if we want to prioritize data "safety" then it's better to write a series of datafiles
                 Serial.println("\nWaiting for Next Data Point Collection Cycle: Hold Button to End Data Collection (Wait Until Teminal (binary data done) is stated");
                 Serial.println("If Unable to Reconnect to the Terminal Hold the Button Down for 30 seconds to halt Data Collection");
-                digitalWrite(8,HIGH);
-                delay(5000);
-                digitalWrite(8,LOW);
+                digitalWrite(checker,HIGH);
+                delay(500);
+                temp_stabilizer();//This either turns on the heater or off
+                digitalWrite(checker,LOW);
+
                 // we're not going to worry about data overflowing -- more measurements means more SNR!
             }
         }
