@@ -6,8 +6,8 @@
 #include <DallasTemperature.h>
 
 #define SD_CHIP_SELECT_PIN 4
-#define SPI_CHIP_SELECT 53 // Defining the slave pin
-#define ONE_WIRE_BUS 45 // Data wire is plugged into digital pin 2 on the Arduino
+#define SPI_CHIP_SELECT 10 // Defining the slave pin
+#define ONE_WIRE_BUS 2 // Data wire is plugged into digital pin 2 on the Arduino
 
 
 // Setup a oneWire instance to communicate with any OneWire device
@@ -19,25 +19,25 @@ DallasTemperature sensors(&oneWire);
 
 int deviceCount = 0;
 float tempC;
-float ttar = 40;
+float ttar = 27;
 float tolorance = 4;
 float t_max = ttar + tolorance;
 float t_min = ttar -tolorance;
 
 
 // The relay activators; and heat controllers 
-int activator1 = 27;
-int activator2 = 26;
+int activator1 = 7;
+int activator2 = 8;
 bool heater_on = false; //Heater starts of not on
 bool hit_max = false; // Has not entered max of min yet 
 bool hit_min = false; 
 
-int checker = 44; //The data recording led checker
-int slavecom = 53; // The SC Select pin 
+int checker = 9; //The data recording led checker
+int slavecom = 10; // The SC Select pin 
 
 //pump mechanics
-int pup = 37;
-int pdown = 39;
+int pup = 5;
+int pdown = 6;
 int pcontrol = 3;
 int grace;
 int inter;
@@ -172,8 +172,7 @@ pinMode(A2, INPUT);
 pinMode(slavecom, OUTPUT);
 digitalWrite(slavecom, HIGH);// Keeping the digipot out of the way of the SD code
 
-pinMode(10,OUTPUT);
-digitalWrite(10,HIGH); //This may have caused SD problems
+
 
 /// Pump Mechanics
 pinMode(pup,INPUT_PULLUP);
