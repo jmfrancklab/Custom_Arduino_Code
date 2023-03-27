@@ -170,6 +170,8 @@ void setup()
 pinMode(A0, INPUT);
 pinMode(A2, INPUT);
 pinMode(slavecom, OUTPUT);
+digitalWrite(slavecom, HIGH);// Keeping the digipot out of the way of the SD code
+
 pinMode(10,OUTPUT);
 digitalWrite(10,HIGH); //This may have caused SD problems
 
@@ -185,13 +187,10 @@ pinMode(activator2,OUTPUT);
 
 
     
-    Serial.begin(9600);
-    sensors.begin();	// Start up the library
-    digitalWrite(slavecom, HIGH);// Keeping the digipot out of the way of the SD code
-
-    Serial.print("Initializing SD card...");
-
-    if (!SD.begin(SD_CHIP_SELECT_PIN))
+Serial.begin(9600);
+sensors.begin();
+Serial.print("Initializing SD card...");
+if (!SD.begin(SD_CHIP_SELECT_PIN))
     {                                             // even though this argument is technically optional, we do need to select chip 4 for this to work!!
         Serial.println("initialization failed!"); // Shows a problem if the SD never acually is reconigized by arduino
         return;
