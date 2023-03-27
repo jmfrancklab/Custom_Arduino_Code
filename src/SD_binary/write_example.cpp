@@ -6,7 +6,7 @@
 #include <DallasTemperature.h>
 
 #define SD_CHIP_SELECT_PIN 4
-#define SPI_CHIP_SELECT 10 // Defining the slave pin
+#define SPI_CHIP_SELECT  // Defining the slave pin
 #define ONE_WIRE_BUS 5 // Data wire is plugged into digital pin 2 on the Arduino
 
 
@@ -178,6 +178,7 @@ digitalWrite(slavecom, HIGH);// Keeping the digipot out of the way of the SD cod
 pinMode(pup,INPUT_PULLUP);
 pinMode(pdown,INPUT_PULLUP);
 pinMode(pcontrol,OUTPUT);
+
 inter = 1;
 lastlog = 0;
 // Heater Mechancis
