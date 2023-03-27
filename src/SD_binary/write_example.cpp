@@ -6,8 +6,8 @@
 #include <DallasTemperature.h>
 
 #define SD_CHIP_SELECT_PIN 4
-#define SPI_CHIP_SELECT  // Defining the slave pin
-#define ONE_WIRE_BUS 5 // Data wire is plugged into digital pin 2 on the Arduino
+#define SPI_CHIP_SELECT 53 // Defining the slave pin
+#define ONE_WIRE_BUS 37 // Data wire is plugged into digital pin 2 on the Arduino
 
 
 // Setup a oneWire instance to communicate with any OneWire device
@@ -32,12 +32,12 @@ bool heater_on = false; //Heater starts of not on
 bool hit_max = false; // Has not entered max of min yet 
 bool hit_min = false; 
 
-int checker = A1; //The data recording led checker
-int slavecom = 10; // The SC Select pin 
+int checker = 36; //The data recording led checker
+int slavecom = 53; // The SC Select pin 
 
 //pump mechanics
-int pup =A4 ;
-int pdown = A3;
+int pup =43 ;
+int pdown = 42;
 int pcontrol = 3;
 int grace;
 int inter;
