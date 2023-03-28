@@ -55,10 +55,12 @@ void device_checker (){
 float average_C(){
   sensors.requestTemperatures();
   float a= sensors.getTempCByIndex(0);
-  float b= sensors.getTempCByIndex(1);
-  return  float(a+b)/2;  
+ // float b= sensors.getTempCByIndex(1); Using only one temp for now since this works
+  return  float(a);  //Got rid of average for now 
 //Look up how to have a value continually sum with a for loop
 }
+/*
+
 void heatsetup(){
 
 digitalWrite(activator1,HIGH);
@@ -75,6 +77,8 @@ Serial.print("Real Temp is ");
 Serial.print(average_C());
 
 }
+
+*///for acqiring the heat temp curve
 void temp_stabilizer(){
   if(average_C()>= t_max && !hit_max){
     digitalWrite(activator1,LOW);
