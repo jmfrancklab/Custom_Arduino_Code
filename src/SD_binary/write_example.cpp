@@ -19,7 +19,7 @@ DallasTemperature sensors(&oneWire);
 
 int deviceCount = 0;
 float tempC;
-float ttar = 27;
+float ttar = 50;
 float tolorance = 4;
 float t_max = ttar + tolorance;
 float t_min = ttar -tolorance;
@@ -229,11 +229,12 @@ digitalWrite(slavecom, LOW);
     digitalWrite(slavecom, HIGH); ///Setting up intensity of the light will be modified eventually
 
 device_checker();
-heatsetup();
+//heatsetup(); not doing this will just start the heaters at the end
 Pump_Control();
 
 lastButtonPress = millis();
-   
+digitalWrite(activator1,HIGH);
+digitalWrite(activator2,HIGH);
 }
 
 void loop()

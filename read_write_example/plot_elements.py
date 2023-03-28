@@ -22,16 +22,15 @@ mytype = dtype(
             # BUT arduino gives sizeof as 6, so there is no garbage 
             ("time","<u4"), # search "arduino long int size" for the size here
             ("finetime","<u4"), # search "arduino long int size" for the size here
+            ("Temp_C","<f4")
             ]
         )
 result = fromfile("TEST.DAT", dtype=mytype)
-print("length of result:",len(result))
-for thiselem in result:
-    print(thiselem)
+
 #print(result["voltage"][0:20],result["time"][0:20])
-plot(result["time"], result["voltage"], "o-")
-title('vs milliseconds')
-figure()
-plot(result["finetime"], result["voltage"], "o-")
-title('vs microseconds')
+plot(result["time"]/60000, result["Temp_C"], "o-")
+title('Temperature [C] vs Time [minutes] ')
+
 show()
+
+
