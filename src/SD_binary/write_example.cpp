@@ -5,6 +5,10 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
+// I'm not editing this yet -- should be compared against tag last_jf_review,
+// but this code is not formatted, and I don't support editing this until I see
+// a flow-chart showing how the original code works
+
 #define SD_CHIP_SELECT_PIN 4
 #define SPI_CHIP_SELECT 53 // Defining the slave pin
 #define ONE_WIRE_BUS 37 // Data wire is plugged into digital pin 2 on the Arduino
@@ -152,7 +156,6 @@ struct Datastore
     float Temp_C;
     unsigned long int time;       // similarly, just the result of millis
     unsigned long int time_short; // What is the purpose of this JF answers -- to get more accurate time!
-
 };
 
 File myFile;
@@ -194,7 +197,7 @@ pinMode(activator2,OUTPUT);
 Serial.begin(9600);
 sensors.begin();
 Serial.print("Initializing SD card...");
-if (!SD.begin(SD_CHIP_SELECT_PIN))
+    if (!SD.begin(SD_CHIP_SELECT_PIN))
     {                                             // even though this argument is technically optional, we do need to select chip 4 for this to work!!
         Serial.println("initialization failed!"); // Shows a problem if the SD never acually is reconigized by arduino
         return;
