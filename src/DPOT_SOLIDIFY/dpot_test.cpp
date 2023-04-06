@@ -1,5 +1,7 @@
 #include <Arduino.h>
 #include <SPI.h>
+#include <SD.h>
+
 /*
 [platformio]
 src_dir = src/DPOT_SOLIDIFY
@@ -14,18 +16,48 @@ lib_deps =
 	milesburton/DallasTemperature@^3.11.0
 */
 
-
-
 // Setting integers to for data keepers
-
- int num_average = 10; //The number of counts before the average is taken
- int sensing_pin_op_amp = A0; //Where the analog integer will be housed
- int slave_select_digi = 10; // Slave selected pin for the arduino (can change depending on board)
+int num_average = 10; //The number of counts before the average is taken
+int sensing_pin_op_amp = A0; //Where the analog integer will be housed
+int slave_select_digi = 10; // Slave selected pin for the arduino (can change depending on board)
 int serial_speed = 9600;
+
+//Now setting datastore structure and SD Mechanics
+
+struct datastore //Now setting datastore structure 
+
+{
+// The datatype followed by the name of the place holder is given
+
+unsigned long int millistime; //Time from the millis function count
+unsigned long int microtime; // Time from the smaller micros function
+float Voltage_analog_input; // The analog input single from the OD sensor
+int digi_pot_wiper_position; //The digipot wiping position
+};
+char *filename = "OD_Test_Solid.dat";
+const int datalen = 20; //Size off each struct or... amount of time it takes to dump data to SD NOTE MUST BE CONST INT
+char *filename = "OD_Test_Solid.dat"; // The name of the file
+int fileplaceholder = 1;
+File datafile; // Created an instance of the open file 
+datafile = SD.open(filename,FILE_WRITE); //Creating the instance which opens the file
+datastore dbuff[datalen]; // Created the datalen constant
+
 
 SPISettings mySetting(16000000, MSBFIRST,SPI_MODE0 ); //Defining the SPI SETTINGS
 // the defult settings for the arduino (Mega may be different)
 // Initialized settings for the ATMEGA328P core
+
+void datadump(){
+datafile.seek(EOF); //Seeks the end of the file before
+int data_wrote = datafile.write((const uint8_t *)dbuff, sizeof(dbuff));//Writing to the file
+Serial.print("Wrote: ");
+Serial.print(data_wrote); // To check if data actually written 
+Serial.print(" much data\n");
+datafile.close(); // Closes the file to preserve the data
+
+
+
+}
 
 void digiwrite (int digi_value){
 
@@ -36,8 +68,6 @@ SPI.transfer(digi_value);
 digitalWrite(slave_select_digi,HIGH); // Switching recieving bit back to zero
 SPI.endTransaction();  // Ends the transaction for this specific spi device
 }
-
-
 void setup(){
 
 SPI.begin();// Initializes the SPI bus by setting SCK, MOSI, and SS to outputs, pulling SCK and MOSI low, and SS high.
@@ -48,7 +78,6 @@ digiwrite(0);
 delay(5000);
 
 }
-
 void loop(){
 int j = 100; // Restarting the variable resistor program
   for( j;j>=0;j--){
