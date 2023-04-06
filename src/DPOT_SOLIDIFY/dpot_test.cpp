@@ -132,11 +132,12 @@ SPI.begin(); // Initializes the SPI bus by setting SCK, MOSI, and SS to outputs,
 pinMode(slave_select_digi,OUTPUT);
 pinMode(sensing_pin_op_amp,INPUT);
 checkSD();
+delay(50);
 
 
 }
 void loop(){
-
+digiwrite(0);
 int j = 100; // Restarting the variable resistor program
 int place = 0;
   
