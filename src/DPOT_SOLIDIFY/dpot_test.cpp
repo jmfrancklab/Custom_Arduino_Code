@@ -126,7 +126,7 @@ void setup()
 }
 void loop()
 {
-  digiwrite(0);
+  digiwrite(100);
   int j = 100;   // Restarting the variable resistor program
   int place = 0; // The place is reset to zero or one of the 20 slots within the structre since again, 0 is the first structure storage space
 
