@@ -21,6 +21,8 @@ int num_average = 10;        // The number of counts before the average is taken
 int sensing_pin_op_amp = A0; // Where the analog integer will be housed
 int slave_select_digi = 9;   // Slave selected pin for the arduino (can change depending on board)
 int serial_speed = 9600;
+int j = 100;   // Restarting the variable resistor program
+int place = 0; // The place is set to zero or one of the 20 slots within the structre since again, 0 is the first structure storage space
 
 // Now setting datastore structure and SD Mechanics
 
@@ -127,8 +129,6 @@ void setup()
 void loop()
 {
   digiwrite(100);
-  int j = 100;   // Restarting the variable resistor program
-  int place = 0; // The place is reset to zero or one of the 20 slots within the structre since again, 0 is the first structure storage space
 
   for (j; j >= 0; j--)
   {
@@ -139,7 +139,8 @@ void loop()
     {                       // If the structure is full since the element starts at zero to 19 which is 20 thus why datalen - 1
       Serial.print("\n\n"); // New line
       datadump();           // Dumping the data into the SD card
-      print_structure();    // Printing the recentally dumped structure onto the serial
+      print_structure(); // Printing the recentally dumped structure onto the serial
+      place = 0;   
     }
   }
 }
