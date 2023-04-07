@@ -129,7 +129,7 @@ void setup()
 void loop()
 {
   digiwrite(100);
-
+  j = 100; //Initally set to 100 at the beginning but once the for loop is finished... the j must be resetting since j controls the digipot wiper setting with 100 sensitive starting point
   for (j; j >= 0; j--)
   {
     serline(j);              // Writing a line of code to the serial which gives the current state of the detecting value along with time
@@ -140,7 +140,7 @@ void loop()
       Serial.print("\n\n"); // New line
       datadump();           // Dumping the data into the SD card
       print_structure(); // Printing the recentally dumped structure onto the serial
-      place = 0;   
+      place = 0; // Reset the place holder back to the first place of the structure since the structre has been written to the SD card
     }
   }
 }
