@@ -1,8 +1,5 @@
 #include <Arduino.h>
 #include <SPI.h>
-#include <SD.h>
-
-#define CHIP_SELECT_PIN_SD 4
 
 /*
 [platformio]
@@ -19,35 +16,12 @@ lib_deps =
 */
 
 // Setting integers to for data keepers
-int num_average = 10; //The number of counts before the average is taken
 int sensing_pin_op_amp = A0; //Where the analog integer will be housed
 int slave_select_digi = 9; // Slave selected pin for the arduino (can change depending on board)
-int serial_speed = 9600;
+                           // a link needs to be provided describing what this means
 
-//Now setting datastore structure and SD Mechanics
-
-struct datastore //Now setting datastore structure 
-
-{
-// The datatype followed by the name of the place holder is given
-
-unsigned long int millistime; //Time from the millis function count
-unsigned long int microtime; // Time from the smaller micros function
-float Voltage_analog_input; // The analog input single from the OD sensor
-int digi_pot_wiper_position; //The digipot wiping position
-};
-
-File dataFile; // Created an instance of the open file 
-
-const int datalen = 20; //Size off each struct or... amount of time it takes to dump data to SD NOTE MUST BE CONST INT
-char *filename = "OD_Test_Solid.dat"; // The name of the file
-int fileplaceholder = 1;
-
-
- //Creating the instance which opens the file
-datastore dbuff[datalen]; // Created the datalen constant
-
-
+// the following is not properly formatted -- format it!
+// I'll read it after you reformat it (b/c if I reformat it, it will complicate the diff)
 SPISettings mySetting(16000000, MSBFIRST,SPI_MODE0 ); //Defining the SPI SETTINGS
 // the defult settings for the arduino (Mega may be different)
 // Initialized settings for the ATMEGA328P core
@@ -63,10 +37,6 @@ if (!SD.begin(CHIP_SELECT_PIN_SD))
     Serial.println("initialization done."); // Confirms Arduino SD error is not the problem
 
     // Write adds to end, so remove any preexisting file
-    if (SD.exists(filename))
-    {                        // If already a file
-        SD.remove(filename); // Remove the file to stop weird confusing
-    }
 }
 void print_structure (){
 

@@ -29,8 +29,10 @@ result = fromfile("TEST.DAT", dtype=mytype)
 
 #print(result["voltage"][0:20],result["time"][0:20])
 plot(result["time"]/60000, result["Temp_C"], "o-")
-title('Temperature [C] vs Time [minutes] ')
-
+xlabel("time / ms")
+ylabel("temperature / °C")
+figure()
+plot(result["time"], result["voltage"], "o-")
+xlabel("time / ms")
+ylabel("voltage / V")
 show()
-
-
