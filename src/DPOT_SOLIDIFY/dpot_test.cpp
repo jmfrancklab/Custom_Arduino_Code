@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <SPI.h>
+#include <SD.h>
 
 /*
 [platformio]
@@ -51,7 +52,7 @@ void checkSD()
   pinMode(10, OUTPUT);
   digitalWrite(10, HIGH);
   Serial.print("Initializing SD card...");
-  if (!SD.begin(CHIP_SELECT_PIN_SD))
+  if (!SD.begin(4))
   {                                           // even though this argument is technically optional, we do need to select chip 4 for this to work!!
     Serial.println("initialization failed!"); // Shows a problem if the SD never acually is reconigized by arduino
     return;
