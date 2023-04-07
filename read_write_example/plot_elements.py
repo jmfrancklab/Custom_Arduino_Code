@@ -13,4 +13,12 @@ title('Temperature vs Time')
 text(0.02, 0.95, 'This is not a Unit Converted Relation\nBut the Raw Data Found From A Digital Temp Recorder', 
      transform=plt.gca().transAxes, va='top', ha='left', bbox=dict(facecolor='lightgray', alpha=0.5, pad=5))
 
+#print(result["voltage"][0:20],result["time"][0:20])
+plot(result["time"]/60000, result["Temp_C"], "o-")
+xlabel("time / ms")
+ylabel("temperature / °C")
+figure()
+plot(result["time"], result["voltage"], "o-")
+xlabel("time / ms")
+ylabel("voltage / V")
 show()

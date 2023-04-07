@@ -1,8 +1,5 @@
 #include <Arduino.h>
 #include <SPI.h>
-#include <SD.h>
-
-#define CHIP_SELECT_PIN_SD 4
 
 /*
 [platformio]
@@ -61,11 +58,7 @@ void checkSD()
   }
   Serial.println("initialization done."); // Confirms Arduino SD error is not the problem
 
-  // Write adds to end, so remove any preexisting file
-  if (SD.exists(filename))
-  {                      // If already a file
-    SD.remove(filename); // Remove the file to stop weird confusing
-  }
+    // Write adds to end, so remove any preexisting file
 }
 void print_structure()
 {

@@ -5,6 +5,10 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
+// I'm not editing this yet -- should be compared against tag last_jf_review,
+// but this code is not formatted, and I don't support editing this until I see
+// a flow-chart showing how the original code works
+
 #define SD_CHIP_SELECT_PIN 4
 #define SPI_CHIP_SELECT 53 // Defining the slave pin
 #define ONE_WIRE_BUS 37    // Data wire is plugged into digital pin 2 on the Arduino
