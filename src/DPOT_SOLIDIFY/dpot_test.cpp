@@ -60,8 +60,12 @@ void checkSD()
     return;
   }
   Serial.println("initialization done."); // Confirms Arduino SD error is not the problem
+  
+  if (SD.exists(filename)){                        // If already a file
+        SD.remove(filename); // Remove the file to stop weird confusing
+    }
 
-    // Write adds to end, so remove any preexisting file
+  
 }
 void print_structure()
 {
@@ -88,11 +92,12 @@ void datastore_add(int place, int j)
   dbuff[place].Voltage_analog_input = analogRead(sensing_pin_op_amp);
   dbuff[place].digi_pot_wiper_position = j; // Since the place i
 }
-void datadump()
+void datadump(datastore *dbuff, int datalen)
 {
- 
+  int data_wrote;
   dataFile = SD.open(filename,FILE_WRITE); // Changed to actually open the file before doing anythign with the data writing
-  int data_wrote = dataFile.write((const uint8_t *)dbuff, sizeof(dbuff)); // Writing to the file
+  dataFile.seek(EOF);
+  data_wrote = dataFile.write((const uint8_t *)dbuff, sizeof(datastore)*datalen); // Writing to the file
   Serial.print("Wrote: ");
   Serial.print(data_wrote); // To check if data actually written
   Serial.print(" much data\n");
@@ -137,10 +142,10 @@ void loop()
     serline(j);              // Writing a line of code to the serial which gives the current state of the detecting value along with time
     datastore_add(place, j); // Add an element to the structure
     place++;                 // Increasing the place of the structure
-    if (place > datalen - 1)
+    if (place > datalen -1)
     {                       // If the structure is full since the element starts at zero to 19 which is 20 thus why datalen - 1
       Serial.print("\n\n"); // New line
-      datadump();           // Dumping the data into the SD card
+      datadump(dbuff, datalen);           // Dumping the data into the SD card
       print_structure(); // Printing the recentally dumped structure onto the serial
       place = 0; // Reset the place holder back to the first place of the structure since the structre has been written to the SD card
     }

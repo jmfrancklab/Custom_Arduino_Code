@@ -45,7 +45,6 @@ int inter;
 
 void device_checker()
 {
-
     Serial.print("Locating devices...");
     Serial.print("Found ");
     deviceCount = sensors.getDeviceCount();
@@ -64,7 +63,6 @@ float average_C()
 
 void heatsetup()
 {
-
     digitalWrite(activator1, HIGH);
     digitalWrite(activator2, HIGH);
 
@@ -200,8 +198,7 @@ void setup()
     Serial.println("initialization done."); // Confirms Arduino SD error is not the problem
 
     // Write adds to end, so remove any preexisting file
-    if (SD.exists(filename))
-    {                        // If already a file
+    if (SD.exists(filename)){                        // If already a file
         SD.remove(filename); // Remove the file to stop weird confusing
     }
     totalDatapointCounter = 0;         // This is the total number of datapoints that have been acquired
