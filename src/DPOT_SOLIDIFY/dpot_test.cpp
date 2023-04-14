@@ -40,7 +40,7 @@ struct datastore // Now setting datastore structure
 File dataFile; // Created an instance of the open file
 
 const int datalen = 20;               // Size off each struct or... amount of time it takes to dump data to SD NOTE MUST BE CONST INT
-char *filename = "OD_Test_Solid.dat"; // The name of the file
+const char *filename = "OD_Test_Solid.dat"; // The name of the file
 int fileplaceholder = 1;
 
 // Creating the instance which opens the file
@@ -92,12 +92,12 @@ void datastore_add(int place, int j)
   dbuff[place].Voltage_analog_input = analogRead(sensing_pin_op_amp);
   dbuff[place].digi_pot_wiper_position = j; // Since the place i
 }
-void datadump(datastore *dbuff, int datalen)
+void datadump()
 {
   int data_wrote;
   dataFile = SD.open(filename,FILE_WRITE); // Changed to actually open the file before doing anythign with the data writing
-  dataFile.seek(EOF);
-  data_wrote = dataFile.write((const uint8_t *)dbuff, sizeof(datastore)*datalen); // Writing to the file
+  
+  data_wrote = dataFile.write((const uint8_t *)dbuff,sizeof(dbuff)); // Writing to the file
   Serial.print("Wrote: ");
   Serial.print(data_wrote); // To check if data actually written
   Serial.print(" much data\n");
@@ -106,6 +106,11 @@ void datadump(datastore *dbuff, int datalen)
   Serial.println(dataFile.available());
   Serial.print("The name of the file is: ");
   Serial.println(dataFile.name());
+  Serial.print("Size of Structure: ");
+  Serial.println(sizeof(dbuff));
+  Serial.print("Position of the file is: ");
+  Serial.println(dataFile.position());
+
 
   
 }
@@ -151,7 +156,7 @@ void loop()
     if (place > datalen -1)
     {                       // If the structure is full since the element starts at zero to 19 which is 20 thus why datalen - 1
       Serial.print("\n\n"); // New line
-      datadump(dbuff, datalen);           // Dumping the data into the SD card
+      datadump();           // Dumping the data into the SD card
       print_structure(); // Printing the recentally dumped structure onto the serial
       place = 0; // Reset the place holder back to the first place of the structure since the structre has been written to the SD card
     }
