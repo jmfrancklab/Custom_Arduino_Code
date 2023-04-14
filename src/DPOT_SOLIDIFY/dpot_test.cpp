@@ -90,6 +90,8 @@ void datastore_add(int place, int j)
 }
 void datadump()
 {
+ 
+  dataFile = SD.open(filename,FILE_WRITE); // Changed to actually open the file before doing anythign with the data writing
   int data_wrote = dataFile.write((const uint8_t *)dbuff, sizeof(dbuff)); // Writing to the file
   Serial.print("Wrote: ");
   Serial.print(data_wrote); // To check if data actually written
