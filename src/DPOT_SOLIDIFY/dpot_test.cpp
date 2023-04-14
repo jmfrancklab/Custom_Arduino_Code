@@ -102,6 +102,12 @@ void datadump(datastore *dbuff, int datalen)
   Serial.print(data_wrote); // To check if data actually written
   Serial.print(" much data\n");
   dataFile.close(); // Closes the file to preserve the data
+  Serial.print("Is data avalible? ");
+  Serial.println(dataFile.available());
+  Serial.print("The name of the file is: ");
+  Serial.println(dataFile.name());
+
+  
 }
 void digiwrite(int digi_value)
 {
