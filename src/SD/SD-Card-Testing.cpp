@@ -13,7 +13,7 @@ struct datastore {
 
 datastore buffer[10]; // Have created the data store buffer information
 
-
+char *filename = "hello_.dat";
 
 
 
@@ -37,7 +37,7 @@ void setup() {
   }
   Serial.println("initialization done.");
 
-char *filename = "text.dat";
+
 
   // open the file. note that only one file can be open at a time,
   // so you have to close this one before opening another.
@@ -51,8 +51,24 @@ char *filename = "text.dat";
 
     Serial.print("Num_written ");
     Serial.println(num);
-    // close the file:
-    myFile.close();
+    Serial.print("Wrote: ");
+  Serial.print(num); // To check if data actually written
+  Serial.print(" much data\n");
+  Serial.print("Is data avalible? ");
+  Serial.println(myFile.available());
+  Serial.print("The name of the file is: ");
+  Serial.println(myFile.name());
+  Serial.print("Size of Structure: ");
+  Serial.println(sizeof(buffer));
+  Serial.print("Position of the file is: ");
+  Serial.println(myFile.position());
+  Serial.print("The file Exist? ");
+  Serial.println(SD.exists(filename));
+  Serial.print("The size of the file is now: ");
+  Serial.println(myFile.size());
+  myFile.close();
+   
+  
   
   }
 
@@ -67,13 +83,27 @@ for(i; i<10;i++){
   buffer[i].data2 = i*20;
   buffer[i].data3 = i*30;
 }
-   
+ myFile = SD.open(filename, FILE_WRITE);  
     int num = myFile.write((const uint8_t *)buffer, sizeof(buffer));
  myFile.seek(EOF);
-    Serial.print("Num_written ");
+      Serial.print("Num_written ");
     Serial.println(num);
-    // close the file:
-    myFile.close();
-
-    delay(500);
+    Serial.print("Wrote: ");
+  Serial.print(num); // To check if data actually written
+  Serial.print(" much data\n");
+  Serial.print("Is data avalible? ");
+  Serial.println(myFile.available());
+  Serial.print("The name of the file is: ");
+  Serial.println(myFile.name());
+  Serial.print("Size of Structure: ");
+  Serial.println(sizeof(buffer));
+  Serial.print("Position of the file is: ");
+  Serial.println(myFile.position());
+  Serial.print("The file Exist? ");
+  Serial.println(SD.exists(filename));
+  Serial.print("The size of the file is now: ");
+  Serial.println(myFile.size());
+  myFile.close();
+  delay(500);
+   
 }
