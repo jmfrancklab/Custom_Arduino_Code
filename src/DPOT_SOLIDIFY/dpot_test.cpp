@@ -64,8 +64,7 @@ void checkSD()
   if (SD.exists(filename)){  // If already a file
         SD.remove(filename); // Remove the file to stop weird confusing
     }
-    dataFile = SD.open(filename,FILE_WRITE); // Changed to actually open the file before doing anythign with the data writing
-
+   
   
 }
 void print_structure()
@@ -96,12 +95,12 @@ void datastore_add(int place, int j)
 void datadump()
 {
   int data_wrote;
+  dataFile = SD.open(filename,FILE_WRITE);
   dataFile.seek(EOF);// Searching for the end of the file
   data_wrote = dataFile.write((const uint8_t *)dbuff,sizeof(dbuff)); // Writing to the file
   Serial.print("Wrote: ");
   Serial.print(data_wrote); // To check if data actually written
   Serial.print(" much data\n");
-  dataFile.close(); // Closes the file to preserve the data
   Serial.print("Is data avalible? ");
   Serial.println(dataFile.available());
   Serial.print("The name of the file is: ");
@@ -114,6 +113,7 @@ void datadump()
   Serial.println(SD.exists(filename));
   Serial.print("The size of the file is now: ");
   Serial.println(dataFile.size());
+  dataFile.close();
 
 
 
