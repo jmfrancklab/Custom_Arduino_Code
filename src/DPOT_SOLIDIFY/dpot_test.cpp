@@ -110,6 +110,11 @@ void datadump()
   Serial.println(sizeof(dbuff));
   Serial.print("Position of the file is: ");
   Serial.println(dataFile.position());
+  Serial.print("The file Exist?");
+  Serial.println(SD.exists(filename));
+  Serial.print("The size of the file is now: ");
+  Serial.println(dataFile.size());
+
 
 
   
