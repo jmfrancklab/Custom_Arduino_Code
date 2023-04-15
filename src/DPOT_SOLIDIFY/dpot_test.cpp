@@ -61,9 +61,10 @@ void checkSD()
   }
   Serial.println("initialization done."); // Confirms Arduino SD error is not the problem
   
-  if (SD.exists(filename)){                        // If already a file
+  if (SD.exists(filename)){  // If already a file
         SD.remove(filename); // Remove the file to stop weird confusing
     }
+    dataFile = SD.open(filename,FILE_WRITE); // Changed to actually open the file before doing anythign with the data writing
 
   
 }
@@ -95,7 +96,6 @@ void datastore_add(int place, int j)
 void datadump()
 {
   int data_wrote;
-  dataFile = SD.open(*filename,FILE_WRITE); // Changed to actually open the file before doing anythign with the data writing
   dataFile.seek(EOF);// Searching for the end of the file
   data_wrote = dataFile.write((const uint8_t *)dbuff,sizeof(dbuff)); // Writing to the file
   Serial.print("Wrote: ");
