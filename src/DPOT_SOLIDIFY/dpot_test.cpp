@@ -40,7 +40,7 @@ struct datastore // Now setting datastore structure
 File dataFile; // Created an instance of the open file
 
 const int datalen = 20;               // Size off each struct or... amount of time it takes to dump data to SD NOTE MUST BE CONST INT
-char *filename = "DATATest.dat"; // The name of the file IMPORTANT CANNOT HAVE  UNDERSCORTS within THE NAME!!!
+const char *filename = "DataTest.dat"; // The name of the file IMPORTANT CANNOT HAVE  UNDERSCORTS within THE NAME!!!
 int fileplaceholder = 1;
 
 // Creating the instance which opens the file
