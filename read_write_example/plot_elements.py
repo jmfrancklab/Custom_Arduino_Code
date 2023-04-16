@@ -1,24 +1,16 @@
 from pylab import *
 
-mytype = dtype([    ("voltage","<f4"),    ("time","<u4"),    ("finetime","<u4"),    ("Temp_C","<f4")])
 
-result = fromfile("TEST.DAT", dtype=mytype)
 
-plot(result["time"]/60000, result["Temp_C"], "o")
+mytype = dtype([    ("millistime","<u4"),    ("microtime","<u4"),    ("Voltage_analog_input","<u4"),    ("digi_pot_wiper_position","<u4")])
 
-xlabel('Relative Time Difference')
-ylabel('Relative Temperature Difference')
-title('Temperature vs Time')
+result = fromfile("DATATEST.DAT", dtype=mytype)
 
-text(0.02, 0.95, 'This is not a Unit Converted Relation\nBut the Raw Data Found From A Digital Temp Recorder', 
-     transform=plt.gca().transAxes, va='top', ha='left', bbox=dict(facecolor='lightgray', alpha=0.5, pad=5))
+plot(result["digi_pot_wiper_position"], result["Voltage_analog_input"], "o")
 
-#print(result["voltage"][0:20],result["time"][0:20])
-plot(result["time"]/60000, result["Temp_C"], "o-")
-xlabel("time / ms")
-ylabel("temperature / °C")
-figure()
-plot(result["time"], result["voltage"], "o-")
-xlabel("time / ms")
-ylabel("voltage / V")
+xlabel('PW0 Position [0-100]')
+ylabel('Voltage Analog Int [0-1024]')
+title('PW0 Position vs. Time')
+
+
 show()
