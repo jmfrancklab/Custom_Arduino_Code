@@ -2,7 +2,7 @@ from pylab import *
 
 
 
-mytype = dtype([    ("millistime","<u4"),    ("microtime","<u4"),    ("Voltage_analog_input","<u4"),    ("digi_pot_wiper_position","<u4")])
+mytype = dtype([    ("millistime","<u4"),    ("microtime","<u4"),    ("Voltage_analog_input","<f4"),    ("digi_pot_wiper_position","<u4")])
 
 result = fromfile("DATATEST.DAT", dtype=mytype)
 
