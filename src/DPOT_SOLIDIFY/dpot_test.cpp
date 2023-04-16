@@ -98,6 +98,7 @@ void datadump()
   dataFile = SD.open(filename,FILE_WRITE);
 
   data_wrote = dataFile.write((const uint8_t *)dbuff,sizeof(dbuff)); // Writing to the file
+  dataFile.seek(EOF);
   Serial.print("Wrote: ");
   Serial.print(data_wrote); // To check if data actually written
   Serial.print(" much data\n");
