@@ -34,13 +34,13 @@ struct datastore // Now setting datastore structure
   unsigned long int millistime; // Time from the millis function count
   unsigned long int microtime;  // Time from the smaller micros function
   float Voltage_analog_input;   // The analog input single from the OD sensor
-  int digi_pot_wiper_position;  // The digipot wiping position
+  unsigned long int digi_pot_wiper_position;  // The digipot wiping position
 };
 
 File dataFile; // Created an instance of the open file
 
 const int datalen = 20;               // Size off each struct or... amount of time it takes to dump data to SD NOTE MUST BE CONST INT
-const char *filename = "Cell_Growth.DAT"; // The name of the file IMPORTANT CANNOT HAVE  UNDERSCORTS within THE NAME!!!
+const char *filename = "Inf_test.DAT"; // The name of the file IMPORTANT CANNOT HAVE  more than 8 character within the name must follow the file naming system FAT 32
 int fileplaceholder = 1;
 
 // Creating the instance which opens the file
