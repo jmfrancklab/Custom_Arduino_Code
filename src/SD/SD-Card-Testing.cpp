@@ -13,7 +13,7 @@ struct datastore {
 
 datastore buffer[10]; // Have created the data store buffer information
 
-char *filename = "hello_.dat";
+char *filename = "OD_Test_Solid.dat";
 
 
 

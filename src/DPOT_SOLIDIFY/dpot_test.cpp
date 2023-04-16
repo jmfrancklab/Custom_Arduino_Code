@@ -40,7 +40,7 @@ struct datastore // Now setting datastore structure
 File dataFile; // Created an instance of the open file
 
 const int datalen = 20;               // Size off each struct or... amount of time it takes to dump data to SD NOTE MUST BE CONST INT
-char *filename = "Datatest.dat"; // The name of the file
+char *filename = "DATATest.dat"; // The name of the file IMPORTANT CANNOT HAVE  UNDERSCORTS within THE NAME!!!
 int fileplaceholder = 1;
 
 // Creating the instance which opens the file
@@ -96,7 +96,7 @@ void datadump()
 {
   int data_wrote;
   dataFile = SD.open(filename,FILE_WRITE);
-  dataFile.seek(EOF);// Searching for the end of the file
+
   data_wrote = dataFile.write((const uint8_t *)dbuff,sizeof(dbuff)); // Writing to the file
   Serial.print("Wrote: ");
   Serial.print(data_wrote); // To check if data actually written
