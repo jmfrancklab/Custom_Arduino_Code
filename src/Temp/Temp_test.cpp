@@ -3,7 +3,7 @@
 #include <SD.h>
 #include <SPI.h>
 // Data wire is plugged into port 2 on the Arduino
-#define ONE_WIRE_BUS 3
+#define ONE_WIRE_BUS 4
 
 void printAddress(DeviceAddress deviceAddress)
 { 
