@@ -1,62 +1,54 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
-#include <SD.h>
 #include <SPI.h>
-// Data wire is plugged into port 2 on the Arduino
+#include <SD.h>
+
+// Data wire is plugged into digital pin 2 on the Arduino
 #define ONE_WIRE_BUS 2
 
-void printAddress(DeviceAddress deviceAddress)
-{ 
-  for (uint8_t i = 0; i < 8; i++)
-  {
-    Serial.print("0x");
-    if (deviceAddress[i] < 0x10) Serial.print("0");
-    Serial.print(deviceAddress[i], HEX);
-    if (i < 7) Serial.print(", ");
-  }
-  Serial.println("");
-}
+// Setup a oneWire instance to communicate with any OneWire device
+OneWire oneWire(ONE_WIRE_BUS);	
 
-
-
-// Setup a oneWire instance to communicate with any OneWire devices
-OneWire oneWire(ONE_WIRE_BUS);
-
-// Pass our oneWire reference to Dallas Temperature.
+// Pass oneWire reference to DallasTemperature library
 DallasTemperature sensors(&oneWire);
 
-// variable to hold device addresses
-DeviceAddress Thermometer;
-
 int deviceCount = 0;
+float tempC;
 
-void setup()
+void setup(void)
 {
-  // start serial port
+  sensors.begin();	// Start up the library
   Serial.begin(9600);
-
-  // Start up the library
-  sensors.begin();
-
+  
   // locate devices on the bus
-  Serial.println("Locating devices...");
+  Serial.print("Locating devices...");
   Serial.print("Found ");
   deviceCount = sensors.getDeviceCount();
   Serial.print(deviceCount, DEC);
   Serial.println(" devices.");
   Serial.println("");
+}
+
+void loop(void)
+{ 
+  // Send command to all the sensors for temperature conversion
+  sensors.requestTemperatures(); 
   
-  Serial.println("Printing addresses...");
+  // Display temperature from each sensor
   for (int i = 0;  i < deviceCount;  i++)
   {
     Serial.print("Sensor ");
     Serial.print(i+1);
     Serial.print(" : ");
-    sensors.getAddress(Thermometer, i);
-    printAddress(Thermometer);
+    tempC = sensors.getTempCByIndex(i);
+    Serial.print(tempC);
+    Serial.print((char)176);//shows degrees character
+    Serial.print("C  |  ");
+    Serial.print(DallasTemperature::toFahrenheit(tempC));
+    Serial.print((char)176);//shows degrees character
+    Serial.println("F");
   }
+  
+  Serial.println("");
+  delay(1000);
 }
-
-void loop()
-{}
-
