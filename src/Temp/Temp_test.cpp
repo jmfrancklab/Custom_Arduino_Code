@@ -89,9 +89,10 @@ int deviceCount = 0;
 
 void setup(void)
 {
-  checkSD();
+
   sensors.begin();	// Start up the library
   Serial.begin(9600);
+  checkSD();
   
   // locate devices on the bus
   Serial.print("Locating devices...");
@@ -108,7 +109,7 @@ void setup(void)
 void loop(void)
 { 
   int j = 0;
-  for(j; j <datalen-1; j++)
+  for(j; j <=datalen-1; j++)
   temp_rec(j);
   delay(200);
 
