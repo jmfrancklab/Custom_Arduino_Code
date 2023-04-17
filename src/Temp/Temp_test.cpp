@@ -1,6 +1,7 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
-
+#include <SD.h>
+#include <SPI.h>
 // Data wire is plugged into port 2 on the Arduino
 #define ONE_WIRE_BUS 3
 
