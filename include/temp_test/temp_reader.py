@@ -29,7 +29,7 @@ axs[1].plot(new_time, tck_T_average(new_time), color='blue', label="T_average_of
 # Plot temperature readings vs time
 axs[2].plot(result["millistime"] / 1000, result["T_Water"], "--", color='red', label="T_Water")
 axs[2].plot(result["millistime"] / 1000, result["T_average_of_Al_Block"], "--", color='blue', label="T_average_of_Al_Block")
-axs[3].plot(result["millistime"]/1000,result["heater_state"],"o" , color='green', label = "Heater State 0 = off, 1 = on")
+axs[3].plot(result["millistime"]/1000,result["heater_state"],"-" , color='green', label = "Heater State 0 = off, 1 = on")
 # Add labels and legend
 axs[0].set_ylabel('Temperature [C]')
 axs[1].set_ylabel('Temperature [C]')
