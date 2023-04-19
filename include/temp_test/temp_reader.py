@@ -28,8 +28,8 @@ axs[0].plot(new_time, tck_T_Water(new_time), label="T_Water")
 axs[1].plot(new_time, tck_T_average(new_time), label="T_average_of_Al_Block")
 
 # Plot temperature readings vs time
-axs[2].plot(result["millistime"] / 1000, result["T_Water"], "o", label="T_Water")
-axs[2].plot(result["millistime"] / 1000, result["T_average_of_Al_Block"], "o", label="T_average_of_Al_Block")
+axs[2].plot(result["millistime"] / 1000, result["T_Water"], "--", label="T_Water")
+axs[2].plot(result["millistime"] / 1000, result["T_average_of_Al_Block"], "--", label="T_average_of_Al_Block")
 
 # Add labels and legend
 axs[0].set_ylabel('Temperature [C]')
