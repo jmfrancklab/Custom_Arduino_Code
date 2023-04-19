@@ -79,8 +79,8 @@ void checkSD()
 
 
 //Temperature Setup stuff for writing to SD card as well as printing to serial and relay activator variables;
-float ttar = 45;
-float tolorance = 2;
+float ttar = 37;
+float tolorance = 0.25;
 
 
 float t_max = ttar + tolorance; // The tolorances for each constraint
