@@ -20,8 +20,7 @@ new_time = linspace(time_sec.min(), time_sec.max(), 1000)
 fig, axs = subplots(4, 1, figsize=(10, 10))
 
 # Set common x and y limits for all subplots
-xlim([0, 6000])
-ylim([25, 50])
+
 
 # Plot spline fits for T_Water and T_average_of_Al_Block
 axs[0].plot(new_time, tck_T_Water(new_time), label="T_Water")
