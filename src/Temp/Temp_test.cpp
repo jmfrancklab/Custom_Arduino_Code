@@ -17,11 +17,8 @@ const uint8_t sensorC[8] = {0x28, 0x10, 0x0A, 0x94, 0x97, 0x0A, 0x03, 0x40};
 //0x28, 0x26, 0x3B, 0x94, 0x97, 0x0A, 0x03, 0x56 is A
 //0x28, 0x0B, 0xB3, 0x79, 0x97, 0x00, 0x03, 0x6C is B
 //0x28, 0x10, 0x0A, 0x94, 0x97, 0x0A, 0x03, 0x40 is C
-
 int deviceCount = 0; // The devicecount checker or how many temp recorders are there
-
 // Creating a structure for the temperature recording... and FILE SET UP STUFF
-
 struct temprecord { 
   float T_Water;
   float T_average_of_Al_Block; 
@@ -76,13 +73,9 @@ void checkSD()
   
 }
 
-
-
 //Temperature Setup stuff for writing to SD card as well as printing to serial and relay activator variables;
 float ttar = 37;
 float tolorance = 0.25;
-
-
 float t_max = ttar + tolorance; // The tolorances for each constraint
 float t_min = ttar - tolorance; // The tolorances for each constraint
 
@@ -93,7 +86,9 @@ bool heater_on = false; // Heater starts of not on
 bool hit_max = false;   // Has not entered max of min yet
 bool hit_min = false;
 unsigned long int passer;
+
 //The two functions below one checks the function for the correct range within the temp and the other checks or recording
+
 void temp_rec(int j){
 
 sensors.requestTemperatures();
@@ -127,6 +122,7 @@ void temp_stabilizer()
     }
   }
 void temp_report(){
+  
   sensors.requestTemperatures();
   Serial.print("Sensor A: ");
   Serial.print(sensors.getTempC(sensorA));
@@ -137,13 +133,12 @@ void temp_report(){
   Serial.print((char)176);//shows degrees character
   Serial.print(" C ,");
   Serial.print(" Sensor C: ");
-   Serial.print(sensors.getTempC(sensorC));
+  Serial.print(sensors.getTempC(sensorC));
   Serial.print((char)176);//shows degrees character
   Serial.print(" C ");
 
-
-
 }
+
 //Makes the steps to ready up the sensor
 void initalize_t_and_relay (){
   sensors.begin();	// Start up the library
@@ -161,13 +156,6 @@ void initalize_t_and_relay (){
 
 
 }
-
-
-
-
-
-
-
 void setup(void)
 {
   Serial.begin(9600);
@@ -176,10 +164,6 @@ void setup(void)
   
   
 }
-
-
-
-
 void loop(void)
 { 
   int j = 0;
