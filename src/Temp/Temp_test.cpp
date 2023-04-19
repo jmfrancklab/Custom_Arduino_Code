@@ -26,6 +26,7 @@ struct temprecord {
   float T_Water;
   float T_average_of_Al_Block; 
   unsigned long int millistime;
+  unsigned long int heater_state;
 };
 File tempfile; //Created an instance of the open file
 const int datalen = 20; 
@@ -78,8 +79,8 @@ void checkSD()
 
 
 //Temperature Setup stuff for writing to SD card as well as printing to serial and relay activator variables;
-float ttar = 41;
-float tolorance = 3;
+float ttar = 25;
+float tolorance = 2;
 
 
 float t_max = ttar + tolorance; // The tolorances for each constraint
@@ -99,6 +100,12 @@ sensors.requestTemperatures();
 buffer[j].T_Water = sensors.getTempC(sensorA);
 buffer[j].T_average_of_Al_Block= (sensors.getTempC(sensorB)+sensors.getTempC(sensorC))/2;
 buffer[j].millistime = millis();
+if (heater_on == true){
+  buffer[j].heater_state = 1;
+}
+else if( heater_on ==false){
+  buffer[j].heater_state = 0;
+}
 
 
 }
