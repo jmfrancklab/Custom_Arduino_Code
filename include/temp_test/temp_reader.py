@@ -23,16 +23,19 @@ fig, axs = subplots(4, 1, figsize=(10, 10))
 
 
 # Plot spline fits for T_Water and T_average_of_Al_Block
-axs[0].plot(new_time, tck_T_Water(new_time), label="T_Water")
-axs[1].plot(new_time, tck_T_average(new_time), label="T_average_of_Al_Block")
+axs[0].plot(new_time, tck_T_Water(new_time), color='red', label="T_Water")
+axs[1].plot(new_time, tck_T_average(new_time), color='blue', label="T_average_of_Al_Block")
 
 # Plot temperature readings vs time
-axs[2].plot(result["millistime"] / 1000, result["T_Water"], "--", label="T_Water")
-axs[2].plot(result["millistime"] / 1000, result["T_average_of_Al_Block"], "--", label="T_average_of_Al_Block")
-axs[3].plot(result["millistime"]/1000,result["heater_state"],"o" , label = "Heater State 0 = off, 1 = on")
+axs[2].plot(result["millistime"] / 1000, result["T_Water"], "--", color='red', label="T_Water")
+axs[2].plot(result["millistime"] / 1000, result["T_average_of_Al_Block"], "--", color='blue', label="T_average_of_Al_Block")
+axs[3].plot(result["millistime"]/1000,result["heater_state"],"o" , color='green', label = "Heater State 0 = off, 1 = on")
 # Add labels and legend
 axs[0].set_ylabel('Temperature [C]')
 axs[1].set_ylabel('Temperature [C]')
+axs[0].set_xlabel("Time [s]")
+axs[1].set_xlabel("Time [s]")
+
 axs[2].set_xlabel('Time [s]')
 axs[2].set_ylabel('Temperature [C]')
 axs[0].set_title('Spline fits of temperature vs time')
@@ -45,6 +48,9 @@ axs[0].legend()
 axs[1].legend()
 axs[2].legend()
 axs[3].legend()
+
+# Adjust spacing between subplots
+fig.subplots_adjust(hspace=0.5)
 
 # Show plot
 show()

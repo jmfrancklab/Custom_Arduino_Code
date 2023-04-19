@@ -79,7 +79,7 @@ void checkSD()
 
 
 //Temperature Setup stuff for writing to SD card as well as printing to serial and relay activator variables;
-float ttar = 25;
+float ttar = 33;
 float tolorance = 2;
 
 
@@ -105,7 +105,7 @@ buffer[j].heater_state = passer;
 }
 void temp_stabilizer()
 {
-    if (sensors.getTempC(sensorA) >= t_max && !hit_max)
+    if (sensors.getTempC(sensorB) >= t_max && !hit_max)
     {
         passer = 0;
         digitalWrite(activator1, LOW);
@@ -116,7 +116,7 @@ void temp_stabilizer()
 
 
     }
-    else if (sensors.getTempC(sensorA) <= t_min && !hit_min)
+    else if (sensors.getTempC(sensorB) <= t_min && !hit_min)
     {
         passer = 1;
         digitalWrite(activator1, HIGH);
