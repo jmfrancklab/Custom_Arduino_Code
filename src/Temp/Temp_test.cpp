@@ -92,7 +92,7 @@ int activator2 = 6;
 bool heater_on = false; // Heater starts of not on
 bool hit_max = false;   // Has not entered max of min yet
 bool hit_min = false;
-
+unsigned long int passer;
 //The two functions below one checks the function for the correct range within the temp and the other checks or recording
 void temp_rec(int j){
 
@@ -100,28 +100,25 @@ sensors.requestTemperatures();
 buffer[j].T_Water = sensors.getTempC(sensorA);
 buffer[j].T_average_of_Al_Block= (sensors.getTempC(sensorB)+sensors.getTempC(sensorC))/2;
 buffer[j].millistime = millis();
-if (heater_on == true){
-  buffer[j].heater_state = 1;
-}
-else if( heater_on ==false){
-  buffer[j].heater_state = 0;
-}
-
+buffer[j].heater_state = passer;
 
 }
 void temp_stabilizer()
 {
     if (sensors.getTempC(sensorA) >= t_max && !hit_max)
     {
+        passer = 0;
         digitalWrite(activator1, LOW);
         digitalWrite(activator2, LOW);
         hit_max = true;
         hit_min = false;
         Serial.println("Heater Off");
 
+
     }
     else if (sensors.getTempC(sensorA) <= t_min && !hit_min)
     {
+        passer = 1;
         digitalWrite(activator1, HIGH);
         digitalWrite(activator2, HIGH);
         hit_min = true;
