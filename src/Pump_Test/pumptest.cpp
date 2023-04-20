@@ -1,57 +1,80 @@
 #include <Arduino.h>
 #include <SPI.h>
+#define ENA_MotorPin A2
+#define IRupt 2
+#define IN1 3
+#define IN2 5
 
-//The variables 
-int pcontrol = 3;
-int pdown = 7;
-int pup = 6;
+//Defining the pump interupt flag
 
-int inter = 1;
+volatile bool PumpFlag = false;
+volatile bool TempFlag = false;
+volatile bool StatusFlag = false;
+volatile bool Pump_switch = false;
+bool Pump_State = false;
 
-int grace;
+int decider; //Helps with deciding which side program to activate
+
+//Defining the handling interupt flag 
+
+void handleInterrupt(){
+    Serial.print("Choose a Mode");
+    Serial.println("Type 1 for Status Update");
+    Serial.println("Type 2 for Pump Control");
+    Serial.println("Type 3 for Temp Control");
+    Serial.println("Type 4 for Turning on or off the Pump");
+    
+    int decider = Serial.parseInt();
+
+    switch(decider) {
+  case 1:
+  StatusFlag = true;
+  Serial.println("Wait for status update: ");
+    break;
+  case 2:
+   PumpFlag = true;
+   Serial.println("Wait for Pump Setting: ");
+    break;
+  case 3:
+    TempFlag = true;
+    Serial.println("Wait for TempSetting");
+    break;
+    case 4:
+    Serial.println("Switching Pump State");
+
+
+  default:
+    break;
+}
+
+
+
+}
+
+
+
+
+
+
+
+
+
 
 
 
 
 void setup(){
-// Setting the pinmodes
-pinMode(pcontrol,OUTPUT);
-pinMode(pdown,INPUT_PULLUP);
-pinMode(pup,INPUT_PULLUP);
-grace = 0;
-inter = 0;
-Serial.begin(9000);
+
+
+
 
 }
 
 
-
-void loop(){
-//Defining the control values
-
-grace = millis();
-Serial.println("\n You may adjust the pump speed now ");
-            while(millis()- grace <= 10000){
-                if(digitalRead(pup) == LOW){ 
-                    if(inter<255){
-                    inter++;
-                    analogWrite(pcontrol,inter);
-                    delay(50);    
-                    }
-                }
-                    if(digitalRead(pdown) == LOW){ 
-                        if(inter>0){
-                            inter --;
-                            analogWrite(pcontrol,inter);
-                            delay(50);    
-                        };
-
-                    ///While holding down the button the value increases 
+void loop (){ 
 
 
-                    }
-            }       
-Serial.println("Pump Switch Time Oover wait until next que");
-delay(4000);  
+
+
+
 }
-
