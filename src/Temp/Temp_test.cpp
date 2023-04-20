@@ -6,7 +6,7 @@
 
 
 // Data wire is plugged into digital pin 2 on the Arduino
-#define ONE_WIRE_BUS 2
+#define ONE_WIRE_BUS A3
 // Setup a oneWire instance to communicate with any OneWire device
 OneWire oneWire(ONE_WIRE_BUS);	
 // Pass oneWire reference to DallasTemperature library
