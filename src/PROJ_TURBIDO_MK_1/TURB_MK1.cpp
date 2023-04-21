@@ -79,9 +79,26 @@ File MYDATA; //Created an instance of the open file
 
 //NOW INTRODUCING VARIABLES WHICH WILL BE WITHIN FUNCITON ARGUEMENTS
 
+//SD variables and Structure variables
+
+const int datalen = 20; //The size of the data structure which is pushed into the SD card
+temprecord buffer[datalen]; // Size off each struct or... amount of time it takes to dump data to SD NOTE MUST BE CONST INT
+const char *filename = "DATAREC.dat"; // The name of the file IMPORTANT CANNOT HAVE  more than 8 character within the name must follow the file naming system FAT 32
 
 
+//Pump Mechanics
 
+int push_pump; // Value entered into the serial to control the pump 
+bool Pump_State = true; // The value to determine the on or off state of the pump
+float push_temp; // Value to set the temperature setting of the pump
+
+
+//Interrupt mechanics
+
+bool inter_on = false; // used to revert back to main program feed back after interuppt commmands finished 
+int decider; //Helps with deciding which side program to activate
+bool data_is_running = false; // A conditional switch to true after a command 
+bool data_end = false; // A conditional which switches to true after a serial command to end the program is made
 
 
 
