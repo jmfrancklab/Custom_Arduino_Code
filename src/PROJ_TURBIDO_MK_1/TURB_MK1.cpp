@@ -100,6 +100,17 @@ int decider; //Helps with deciding which side program to activate
 bool data_is_running = false; // A conditional switch to true after a command 
 bool data_end = false; // A conditional which switches to true after a serial command to end the program is made
 
+//Temp mechanics
+
+float push_temp; // Value which is passed to temp target to find help with temp control stabalization
+float ttar = 22; // Target temp 22 as defult 
+float tolorance = 0.25; 
+float t_max = ttar + tolorance; // The tolorances for each constraint
+float t_min = ttar - tolorance; // The tolorances for each constraint
+bool heater_on = false; // Heater starts of not on
+bool hit_max = false;   // Has not entered max of min yet
+bool hit_min = false; // Used to determine the on off cycle of the heater
+unsigned long int passer; // Variable to pass the value of wether the heater is on or off
 
 
 
