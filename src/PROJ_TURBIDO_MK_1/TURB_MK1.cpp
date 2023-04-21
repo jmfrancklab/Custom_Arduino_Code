@@ -20,7 +20,7 @@
 #define sensing_pin_op_amp A0 //The reading for cell count corrolation
 #define slave_select_digi 9 // The slave communicator for the Digipot
 #define Chip_Select_Pin 4 // The ethernet and SD chip select pin
-
+#define HIGH_PIN 10 //In order for the arduino sheild to work must be present
 //PUMP CONTROL
 
 #define ENA_MotorPin 5 //Pin for PWM SPEED of PUMP MODULATION
@@ -49,7 +49,7 @@ const uint8_t sensorC[8] = {0x28, 0x10, 0x0A, 0x94, 0x97, 0x0A, 0x03, 0x40};
 
 SPISettings mySetting(16000000, MSBFIRST, SPI_MODE0); // Defining the SPI SETTINGS
 
-struct temprecord { 
+struct datalog { 
   
   //For temp data
   
@@ -82,9 +82,11 @@ File MYDATA; //Created an instance of the open file
 //SD variables and Structure variables
 
 const int datalen = 20; //The size of the data structure which is pushed into the SD card
-temprecord buffer[datalen]; // Size off each struct or... amount of time it takes to dump data to SD NOTE MUST BE CONST INT
+datalog buffer[datalen]; // Size off each struct or... amount of time it takes to dump data to SD NOTE MUST BE CONST INT
 const char *filename = "DATAREC.dat"; // The name of the file IMPORTANT CANNOT HAVE  more than 8 character within the name must follow the file naming system FAT 32
-
+int place = 0; // The place is set to zero or one of the 20 slots within the structre since again, 0 is the first structure storage space
+int serial_speed = 9600; //Setting the serial speed for configuration
+int data_wrote; //The value of the file instance used to gather informaton about the write
 
 //Pump Mechanics
 
@@ -113,4 +115,79 @@ bool hit_min = false; // Used to determine the on off cycle of the heater
 unsigned long int passer; // Variable to pass the value of wether the heater is on or off
 
 
+//OD and DIGIPOT MECHANICS
 
+int place = 0; // The place is set to zero or one of the 20 slots within the structre since again, 0 is the first structure storage space
+int digi_position; //The position of the digipot
+
+
+
+
+//Adding indepentent action functions
+
+void datadump()// writes the full structure to the file
+
+
+{
+  
+  MYDATA= SD.open(filename,FILE_WRITE);
+  data_wrote = MYDATA.write((const uint8_t *)buffer, sizeof(buffer)); // Writing to the file
+  MYDATA.seek(EOF);
+  Serial.print("Wrote: ");
+  Serial.print(data_wrote); // To check if data actually written
+  Serial.print(" much data\n");
+  Serial.print("Is data avalible? ");
+  Serial.println(MYDATA.available());
+  Serial.print("The name of the file is: ");
+  Serial.println(MYDATA.name());
+  Serial.print("Size of Structure: ");
+  Serial.println(sizeof(buffer));
+  Serial.print("Position of the file is: ");
+  Serial.println(MYDATA.position());
+  Serial.print("The file Exist? ");
+  Serial.println(SD.exists(filename));
+  Serial.print("The size of the file is now: ");
+  Serial.println(MYDATA.size());
+  MYDATA.close();
+  
+}
+
+void digiwrite(int digi_value) //Communicates a new resistence level to the digipot
+{
+
+  SPI.beginTransaction(mySetting);      // The transaction settings from the specific Arduino
+  digitalWrite(slave_select_digi, LOW); // Once low the Settings shift to allow writing
+  SPI.transfer(0x00);                   // The 8 bit address that is all zeros to prep to write the bit 0-255 for MCP4151
+  SPI.transfer(digi_value);
+  digitalWrite(slave_select_digi, HIGH); // Switching recieving bit back to zero
+  SPI.endTransaction();                  // Ends the transaction for this specific spi device
+}
+
+void checkSD_initalize() //Set pinmode and initalize the SD 
+{
+  pinMode(Chip_Select_Pin, OUTPUT);
+  pinMode(HIGH_PIN,OUTPUT);
+  digitalWrite(HIGH_PIN, HIGH);
+  
+  Serial.print("Initializing SD card...");
+  if (!SD.begin(Chip_Select_Pin))
+  {                                          
+    Serial.println("initialization failed!"); // Shows a problem if the SD never acually is reconigized by arduino
+    return;
+  }
+  Serial.println("initialization done."); // Confirms Arduino SD error is not the problem
+  if (SD.exists(filename)){  // If already a file
+        SD.remove(filename); // Remove the file to stop weird confusing
+    }
+   
+  
+}
+
+
+int datastore_add (place) { // Adds the current tuple of information to the structure
+  buffer[place].millistime = millis();
+  buffer[place].Voltage_analog_input = analogRead(sensing_pin_op_amp); // Analog Reading of OD
+  buffer[place].digi_pot_wiper_position = digi_position; // Where the digipot is
+  buffer[j].T_Water = sensors.getTempC(sensorA); // Temp Values
+  buffer[j].T_average_of_Al_Block= (sensors.getTempC(sensorB)+sensors.getTempC(sensorC))/2; // Temp value
+}
