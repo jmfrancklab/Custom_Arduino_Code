@@ -45,11 +45,41 @@ const uint8_t sensorC[8] = {0x28, 0x10, 0x0A, 0x94, 0x97, 0x0A, 0x03, 0x40};
 //0x28, 0x0B, 0xB3, 0x79, 0x97, 0x00, 0x03, 0x6C is B
 //0x28, 0x10, 0x0A, 0x94, 0x97, 0x0A, 0x03, 0x40 is C
 
-
-
 //SPI and SD Settings and Control
 
 SPISettings mySetting(16000000, MSBFIRST, SPI_MODE0); // Defining the SPI SETTINGS
+
+struct temprecord { 
+  
+  //For temp data
+  
+  float T_Water;
+  float T_average_of_Al_Block; 
+  unsigned long int millistime;
+  unsigned long int heater_state;
+
+    //For OD and Digipot Data
+  float Voltage_analog_input;   // The analog input single from the OD sensor
+  unsigned long int digi_pot_wiper_position;  // The digipot wiping position
+
+  //For pump 
+
+  unsigned long int pump_speed_setting; //Keeps a record of the pump speed
+  float temp_baseline; //To allow comparision of the baseline temp target and the actual temperature
+
+};
+
+File MYDATA; //Created an instance of the open file
+
+
+
+
+
+
+
+//NOW INTRODUCING VARIABLES WHICH WILL BE WITHIN FUNCITON ARGUEMENTS
+
+
 
 
 
