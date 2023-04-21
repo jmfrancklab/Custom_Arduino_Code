@@ -108,6 +108,7 @@ void user_choice_interface () {
       break;
 
     default:
+      Serial.print("Rerun the Interrupt Again Error Occured");
       
       break;  
   }
