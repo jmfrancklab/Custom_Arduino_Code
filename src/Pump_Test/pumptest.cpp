@@ -1,9 +1,9 @@
 #include <Arduino.h>
 #include <SPI.h>
-#define ENA_MotorPin A2
+#define ENA_MotorPin 5
 #define IRupt 2
-#define IN1 3
-#define IN2 5
+#define IN1 A4
+#define IN2 A1
 
 //Defining the pump interupt flag
 
@@ -21,11 +21,12 @@ bool inter_on = false;
 int decider; //Helps with deciding which side program to activate
 
 //Defining the handling interupt flag 
+
+
 void handleInterrupt(){
 inter_on = true;
 
 }
-
 void user_choice_interface () {
   Serial.println("Choose a Mode");
   Serial.println("Type 1 for Status Update");
@@ -52,6 +53,7 @@ void user_choice_interface () {
         delay(100); // Wait for input
       }
       push_pump = Serial.parseInt();
+    
       
       break;
     case 3:
@@ -66,18 +68,29 @@ void user_choice_interface () {
     case 4:
       Serial.println("Switching Pump State");
       Serial.println("Will Put in the xor state soon"); 
+      Pump_State ^ true; // If true then false if false then true
+      if( Pump_State ==true){
+        analogWrite(ENA_MotorPin, 0);
+
+
+      }
+
+
+
       break;
     default:
       break;  
   }
-}
+} 
+void pump_turn 
 
-
-   
 void setup(){
 Serial.begin(9600);
 pinMode(IRupt, INPUT_PULLUP);
-   attachInterrupt(digitalPinToInterrupt(IRupt), handleInterrupt, FALLING);
+pinMode(IN1, OUTPUT);
+pinMode(IN2, OUTPUT);
+attachInterrupt(digitalPinToInterrupt(IRupt), handleInterrupt, FALLING);
+
 }
 
 
