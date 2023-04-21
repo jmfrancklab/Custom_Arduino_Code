@@ -11,7 +11,7 @@
 int push_pump;
 bool Pump_State = true;
 float push_temp;
-bool inter_finished = false;
+
 bool inter_on = false;
 
 
