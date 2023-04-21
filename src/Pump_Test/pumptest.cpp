@@ -48,7 +48,7 @@ void user_choice_interface () {
       Serial.println("Wait for Pump Setting: ");
       Serial.println("Please type the pump control: (0-255)");
       
-      while (Serial.available()<3) {
+      while (Serial.available()<3 || Serial.peek() == ".") {
         delay(100); // Wait for input
       }
       push_pump = Serial.parseInt();
@@ -58,7 +58,7 @@ void user_choice_interface () {
       TempFlag = true;
       Serial.println("Wait for TempSetting");
       Serial.println("Please type temp setting (20 C < T < 50 C ) Type [xx.xx] ");
-      while (Serial.available()< 4) {
+      while (Serial.available()< 4|| Serial.peek() == "."){
         delay(100); // Wait for input
       }
       push_temp = Serial.parseFloat();
