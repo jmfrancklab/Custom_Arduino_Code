@@ -7,10 +7,7 @@
 
 //Defining the pump interupt flag
 
-volatile bool PumpFlag = false;
-volatile bool TempFlag = false;
-volatile bool StatusFlag = false;
-volatile bool Pump_switch = false;
+
 int push_pump;
 bool Pump_State = true;
 float push_temp;
