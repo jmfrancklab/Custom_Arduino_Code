@@ -103,8 +103,7 @@ bool data_is_running = false; // A conditional switch to true after a command
 bool data_end = false; // A conditional which switches to true after a serial command to end the program is made
 
 //Temp mechanics
-
-float push_temp; // Value which is passed to temp target to find help with temp control stabalization
+int device_count; //The amout of devices that are counted of temp prboes berfore program start
 float ttar = 22; // Target temp 22 as defult 
 float tolorance = 0.25; 
 float t_max = ttar + tolorance; // The tolorances for each constraint
@@ -117,7 +116,6 @@ unsigned long int passer; // Variable to pass the value of wether the heater is 
 
 //OD and DIGIPOT MECHANICS
 
-int place = 0; // The place is set to zero or one of the 20 slots within the structre since again, 0 is the first structure storage space
 int digi_position; //The position of the digipot
 int digi_value; //The value passed to the digiwrite function
 
@@ -126,7 +124,7 @@ int digi_value; //The value passed to the digiwrite function
 
 //Adding indepentent action functions
 
-void datadump()// writes the full structure to the file
+void datadump()
 
 
 {
@@ -153,7 +151,7 @@ void datadump()// writes the full structure to the file
   
 }
 
-int digiwrite(digi_value){ //Communicates a new resistence level to the digipot
+int digiwrite(digi_value){ 
 
   SPI.beginTransaction(mySetting);      // The transaction settings from the specific Arduino
   digitalWrite(slave_select_digi, LOW); // Once low the Settings shift to allow writing
@@ -163,7 +161,7 @@ int digiwrite(digi_value){ //Communicates a new resistence level to the digipot
   SPI.endTransaction();                  // Ends the transaction for this specific spi device
 }
 
-void checkSD_initalize() //Set pinmode and initalize the SD 
+void checkSD_initalize() 
 {
   pinMode(Chip_Select_Pin, OUTPUT);
   pinMode(HIGH_PIN,OUTPUT);
@@ -183,7 +181,7 @@ void checkSD_initalize() //Set pinmode and initalize the SD
   
 }
 
-int datastore_add (place) { // Adds the current tuple of information to the structure
+int datastore_add (place) { 
   
   buffer[place].millistime = millis();
   buffer[place].Voltage_analog_input = analogRead(sensing_pin_op_amp); // Analog Reading of OD
@@ -195,7 +193,7 @@ int datastore_add (place) { // Adds the current tuple of information to the stru
   buffer[place].heater_state = passer;
 }
 
-void initalize_t_and_relay (){ // Sets up the temp control system
+void initalize_t_and_relay (){ 
 
 
  
@@ -216,15 +214,14 @@ void initalize_t_and_relay (){ // Sets up the temp control system
 
 }
 
-void optics_setup(){ //Must be first within the set up
-  
+void optics_setup(){ 
   pinMode(slave_select_digi, OUTPUT);
   pinMode(sensing_pin_op_amp, INPUT);
   SPI.begin(); // Initializes the SPI bus by setting SCK, MOSI, and SS to outputs, pulling SCK and MOSI low, and SS high.
   Serial.begin(serial_speed);
 }
 
-void temp_stabilizer() //Temp stabilizing function for the program
+void temp_stabilizer()
 {
     if (sensors.getTempC(sensorA) >= t_max && !hit_max)
     {
@@ -250,10 +247,150 @@ void temp_stabilizer() //Temp stabilizing function for the program
     }
   }
 
-void system_status(){
+
+void system_status(){  
 
   Serial.print(" Digipot Position is: ");
-  Serial.print(digi_position);
+  Serial.println(digi_position);
   Serial.print("Optic Integer [0-1024]: ");
-  Serial.print()
+  Serial.println(analogRead(sensing_pin_op_amp));
+  Serial.print("\n Pump Speed");
+  Serial.println(push_pump);
+  Serial.print("\n Temp Baseline: ");
+  Serial.print(ttar);
+  sensors.requestTemperatures();
+  Serial.print("Sensor A: ");
+  Serial.print(sensors.getTempC(sensorA));
+
+  Serial.print(" [C] ,");
+  Serial.print("Sensor B: ");
+  Serial.print(sensors.getTempC(sensorB));
+
+  Serial.print(" [C] ,");
+  Serial.print(" Sensor C: ");
+  Serial.print(sensors.getTempC(sensorC));
+  Serial.print(" [C] ");
+
+  Serial.println("At time:  ");
+  Serial.print(millis()/60000);
+  Serial.print(" Minutes ");
+
+  
+
+}
+void handleInterrupt(){
+inter_on = true;
+}
+void initalize_pump_and_interupt() {
+
+pinMode(IRupt, INPUT_PULLUP);
+pinMode(IN1, OUTPUT);
+pinMode(IN2, OUTPUT);
+pinMode(ENA_MotorPin,OUTPUT);
+attachInterrupt(digitalPinToInterrupt(IRupt), handleInterrupt, FALLING);
+
+}
+
+void user_choice_interface () {
+  Serial.println("\n\n\n\n\nChoose a Mode");
+  Serial.println("Type 1 for Pump Control");
+  Serial.println("Type 2 for Temp Control");
+  Serial.println("Type 3 for Turning on or off the Pump");
+  Serial.println("Type 4 for Pump Direction Switch");
+
+  while (!Serial.available()) {
+    delay(100); // Wait for input
+  }
+  int decider = Serial.parseInt();
+  
+  switch(decider) {
+    Serial.flush(); // To make sure if the user presses a faulty key the program does not fail
+    
+    case 1:
+      
+      Serial.println("Wait for Pump Setting: ");
+      Serial.println("Please type the pump control: (0-255), Type xxx or xx. for x < 100");
+      Serial.println("Make sure pump is on first");
+      
+      while (Serial.available()<3 || Serial.peek() == ".") {
+        delay(100); // Wait for input
+      }
+      push_pump = Serial.parseInt();
+      analogWrite(ENA_MotorPin,push_pump);
+      Serial.print("Pump set to analog setting of: ");
+      Serial.print(push_pump);
+    
+      
+      break;
+    case 2:
+      
+      Serial.println("Wait for TempSetting");
+      Serial.println("Please type temp setting (20 C < T < 50 C ) Type xx.xx ");
+      while (Serial.available()< 5|| Serial.peek() == "."){
+        delay(100); // Wait for input
+      }
+      push_temp = Serial.parseFloat();
+      Serial.print("Set temp baseline to: ");
+      Serial.print(push_temp);
+      Serial.print(" C");
+      break;
+    case 3:
+      Serial.println("Switching Pump State");
+      Pump_State ^= true; 
+      //Switching the value from its orgional if off then on if on then off
+      if( Pump_State == true){
+        digitalWrite(IN1,LOW);
+        digitalWrite(IN2,LOW);
+
+
+      } else if (Pump_State ==false){
+          digitalWrite(IN1,HIGH);
+          digitalWrite(IN2, LOW);
+          analogWrite(ENA_MotorPin,10);
+          
+
+      }
+      break;
+      case 4:
+      if ( digitalRead(IN1) == 1 && digitalRead(IN2) == 0){
+
+        digitalWrite(IN1,LOW);
+        digitalWrite(IN2, HIGH);
+        Serial.println("Switch Motor Flow Direction");
+
+      } else if (digitalRead(IN1) == 0 && digitalRead(IN2) == 1){
+
+        digitalWrite(IN1,HIGH);
+        digitalWrite(IN2,LOW);
+        Serial.print("Switched Motor Flow Direction");
+      } else {
+
+        Serial.print("Should Turn on Pump First");
+        
+      }
+      
+      break;
+
+    default:
+      Serial.print("Rerun the Interrupt Again Error Occured");
+      
+      break;  
+  }
+} 
+
+
+
+
+void setup(){
+optics_setup();
+initalize_pump_and_interupt();
+initalize_t_and_relay();
+
+
+}
+
+void loop()  {
+
+
+
 }
