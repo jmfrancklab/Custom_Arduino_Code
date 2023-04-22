@@ -100,7 +100,8 @@ float push_temp; // Value to set the temperature setting of the pump
 bool inter_on = false; // used to revert back to main program feed back after interuppt commmands finished 
 int decider; //Helps with deciding which side program to activate
 bool data_is_running = false; // A conditional switch to true after a command 
-bool data_end = false; // A conditional which switches to true after a serial command to end the program is made
+bool data_end = true; // A conditional which switches to true after a serial command to end the program is made
+bool data_probe = false;
 
 //Temp mechanics
 int device_count; //The amout of devices that are counted of temp prboes berfore program start
@@ -151,14 +152,15 @@ void datadump()
   
 }
 
-int digiwrite(digi_value){ 
+int digiwrite(int digi_value){ 
 
   SPI.beginTransaction(mySetting);      // The transaction settings from the specific Arduino
   digitalWrite(slave_select_digi, LOW); // Once low the Settings shift to allow writing
   SPI.transfer(0x00);                   // The 8 bit address that is all zeros to prep to write the bit 0-255 for MCP4151
   SPI.transfer(digi_value);
   digitalWrite(slave_select_digi, HIGH); // Switching recieving bit back to zero
-  SPI.endTransaction();                  // Ends the transaction for this specific spi device
+  SPI.endTransaction(); 
+  return 0;        // Ends the transaction for this specific spi device
 }
 
 void checkSD_initalize() 
@@ -181,7 +183,7 @@ void checkSD_initalize()
   
 }
 
-int datastore_add (place) { 
+int datastore_add (int place) { 
   
   buffer[place].millistime = millis();
   buffer[place].Voltage_analog_input = analogRead(sensing_pin_op_amp); // Analog Reading of OD
@@ -191,20 +193,21 @@ int datastore_add (place) {
   buffer[place].pump_speed_setting = //Keeps a record of the pump speed
   buffer[place].temp_baseline = ttar; //To allow comparision of the baseline temp target and the actual temperature
   buffer[place].heater_state = passer;
+  place ++;
 }
 
 void initalize_t_and_relay (){ 
 
 
  
- pinMode(activator1,OUTPUT);
+  pinMode(activator1,OUTPUT);
   pinMode(activator2,OUTPUT);
   digitalWrite(activator1,LOW);
   digitalWrite(activator2,LOW);
   sensors.begin();	// Start up the library
   Serial.print("Locating devices...");
   Serial.print("Found ");
-  deviceCount = sensors.getDeviceCount();
+  int deviceCount = sensors.getDeviceCount();
   Serial.print(deviceCount, DEC);
   Serial.println(" devices.");
   Serial.println("");
@@ -247,7 +250,6 @@ void temp_stabilizer()
     }
   }
 
-
 void system_status(){  
 
   Serial.print(" Digipot Position is: ");
@@ -278,9 +280,11 @@ void system_status(){
   
 
 }
+
 void handleInterrupt(){
 inter_on = true;
 }
+
 void initalize_pump_and_interupt() {
 
 pinMode(IRupt, INPUT_PULLUP);
@@ -297,6 +301,7 @@ void user_choice_interface () {
   Serial.println("Type 2 for Temp Control");
   Serial.println("Type 3 for Turning on or off the Pump");
   Serial.println("Type 4 for Pump Direction Switch");
+  Serial.println("Type 5 to start or end a recording program ")
 
   while (!Serial.available()) {
     delay(100); // Wait for input
@@ -368,6 +373,13 @@ void user_choice_interface () {
         Serial.print("Should Turn on Pump First");
         
       }
+      case 5:
+      
+      data_probe = true;
+
+
+
+
       
       break;
 
@@ -390,6 +402,40 @@ initalize_t_and_relay();
 }
 
 void loop()  {
+
+
+
+
+
+temp_stabilizer();
+
+if(data_probe){
+
+
+
+}
+
+if (data_is_running){
+  
+  datastore_add();
+
+  if( place >= datalen-1){
+    noInterrupts();
+    datadump();
+    place = 0;
+    interrupts();
+
+  }
+
+
+
+
+
+
+
+  
+
+}
 
 
 
