@@ -407,6 +407,12 @@ initalize_t_and_relay();
 void loop()  {
 
 temp_stabilizer();
+if(inter_on){
+  user_choice_interface();
+  !inter_on;
+  
+}
+
 
 if(displaying_serial){
   system_status();
@@ -434,7 +440,6 @@ if(data_probe){
 
   }
 }
-
 if (data_is_running){
   delay(500);
   if(displaying_serial){
