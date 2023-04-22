@@ -87,6 +87,7 @@ const char *filename = "DATAREC.dat"; // The name of the file IMPORTANT CANNOT H
 int place = 0; // The place is set to zero or one of the 20 slots within the structre since again, 0 is the first structure storage space
 int serial_speed = 9600; //Setting the serial speed for configuration
 int data_wrote; //The value of the file instance used to gather informaton about the write
+int start_time;
 
 //Pump Mechanics
 
@@ -100,7 +101,7 @@ float push_temp; // Value to set the temperature setting of the pump
 bool inter_on = false; // used to revert back to main program feed back after interuppt commmands finished 
 int decider; //Helps with deciding which side program to activate
 bool data_is_running = false; // A conditional switch to true after a command 
-bool data_end = true; // A conditional which switches to true after a serial command to end the program is made
+bool displaying_serial = false;
 bool data_probe = false;
 
 //Temp mechanics
@@ -185,7 +186,7 @@ void checkSD_initalize()
 
 int datastore_add (int place) { 
   
-  buffer[place].millistime = millis();
+  buffer[place].millistime = start_time - millis();
   buffer[place].Voltage_analog_input = analogRead(sensing_pin_op_amp); // Analog Reading of OD
   buffer[place].digi_pot_wiper_position = digi_position; // Where the digipot is
   buffer[place].T_Water = sensors.getTempC(sensorA); // Temp Values
@@ -301,7 +302,8 @@ void user_choice_interface () {
   Serial.println("Type 2 for Temp Control");
   Serial.println("Type 3 for Turning on or off the Pump");
   Serial.println("Type 4 for Pump Direction Switch");
-  Serial.println("Type 5 to start or end a recording program ")
+  Serial.println("Type 5 to start or end a recording program ");
+  Serial.println("Type 6 to Start or Stop Live data feed");
 
   while (!Serial.available()) {
     delay(100); // Wait for input
@@ -338,6 +340,7 @@ void user_choice_interface () {
       Serial.print("Set temp baseline to: ");
       Serial.print(push_temp);
       Serial.print(" C");
+      push_temp = ttar;
       break;
     case 3:
       Serial.println("Switching Pump State");
@@ -376,11 +379,11 @@ void user_choice_interface () {
       case 5:
       
       data_probe = true;
+      break;
 
+      case 6:
 
-
-
-      
+      displaying_serial ^= true;
       break;
 
     default:
@@ -403,21 +406,41 @@ initalize_t_and_relay();
 
 void loop()  {
 
-
-
-
-
 temp_stabilizer();
 
+if(displaying_serial){
+  system_status();
+}
+
 if(data_probe){
+  
+  data_is_running ^= true;
+  if(data_is_running){
 
+     if (SD.exists(filename)){  // If already a file
+        SD.remove(filename); // Remove the file to stop weird confusing
+    }
+    place = 0;
+    Serial.println("File Removed and Starting new growth Curve ");
+    start_time = millis();
+    displaying_serial = false;
+    delay(200);
 
+  }
+  if(!data_is_running){
+  
+  Serial.println("Data Run Ended you may remove the SD Card for Data Processing");
+  data_probe = false;
 
+  }
 }
 
 if (data_is_running){
-  
-  datastore_add();
+  delay(500);
+  if(displaying_serial){
+  system_status();
+}
+  datastore_add(place);
 
   if( place >= datalen-1){
     noInterrupts();
@@ -427,16 +450,6 @@ if (data_is_running){
 
   }
 
-
-
-
-
-
-
-  
-
 }
-
-
 
 }
