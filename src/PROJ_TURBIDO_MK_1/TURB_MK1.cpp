@@ -397,9 +397,12 @@ void user_choice_interface () {
 
 
 void setup(){
+
 optics_setup();
+checkSD_initalize();
 initalize_pump_and_interupt();
 initalize_t_and_relay();
+
 
 
 }
@@ -410,7 +413,7 @@ temp_stabilizer();
 if(inter_on){
   user_choice_interface();
   !inter_on;
-  
+
 }
 
 
