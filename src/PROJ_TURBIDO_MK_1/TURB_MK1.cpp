@@ -119,6 +119,7 @@ unsigned long int passer; // Variable to pass the value of wether the heater is 
 
 int place = 0; // The place is set to zero or one of the 20 slots within the structre since again, 0 is the first structure storage space
 int digi_position; //The position of the digipot
+int digi_value; //The value passed to the digiwrite function
 
 
 
@@ -152,8 +153,7 @@ void datadump()// writes the full structure to the file
   
 }
 
-void digiwrite(int digi_value) //Communicates a new resistence level to the digipot
-{
+int digiwrite(digi_value){ //Communicates a new resistence level to the digipot
 
   SPI.beginTransaction(mySetting);      // The transaction settings from the specific Arduino
   digitalWrite(slave_select_digi, LOW); // Once low the Settings shift to allow writing
@@ -183,11 +183,77 @@ void checkSD_initalize() //Set pinmode and initalize the SD
   
 }
 
-
 int datastore_add (place) { // Adds the current tuple of information to the structure
+  
   buffer[place].millistime = millis();
   buffer[place].Voltage_analog_input = analogRead(sensing_pin_op_amp); // Analog Reading of OD
   buffer[place].digi_pot_wiper_position = digi_position; // Where the digipot is
-  buffer[j].T_Water = sensors.getTempC(sensorA); // Temp Values
-  buffer[j].T_average_of_Al_Block= (sensors.getTempC(sensorB)+sensors.getTempC(sensorC))/2; // Temp value
+  buffer[place].T_Water = sensors.getTempC(sensorA); // Temp Values
+  buffer[place].T_average_of_Al_Block= (sensors.getTempC(sensorB)+sensors.getTempC(sensorC))/2; // Temp value
+  buffer[place].pump_speed_setting = //Keeps a record of the pump speed
+  buffer[place].temp_baseline = ttar; //To allow comparision of the baseline temp target and the actual temperature
+  buffer[place].heater_state = passer;
+}
+
+void initalize_t_and_relay (){ // Sets up the temp control system
+
+
+ 
+ pinMode(activator1,OUTPUT);
+  pinMode(activator2,OUTPUT);
+  digitalWrite(activator1,LOW);
+  digitalWrite(activator2,LOW);
+  sensors.begin();	// Start up the library
+  Serial.print("Locating devices...");
+  Serial.print("Found ");
+  deviceCount = sensors.getDeviceCount();
+  Serial.print(deviceCount, DEC);
+  Serial.println(" devices.");
+  Serial.println("");
+  
+
+
+
+}
+
+void optics_setup(){ //Must be first within the set up
+  
+  pinMode(slave_select_digi, OUTPUT);
+  pinMode(sensing_pin_op_amp, INPUT);
+  SPI.begin(); // Initializes the SPI bus by setting SCK, MOSI, and SS to outputs, pulling SCK and MOSI low, and SS high.
+  Serial.begin(serial_speed);
+}
+
+void temp_stabilizer() //Temp stabilizing function for the program
+{
+    if (sensors.getTempC(sensorA) >= t_max && !hit_max)
+    {
+        passer = 0;
+        digitalWrite(activator1, LOW);
+        digitalWrite(activator2, LOW);
+        hit_max = true;
+        hit_min = false;
+        Serial.println("Heater Off");
+        
+
+
+    }
+    else if (sensors.getTempC(sensorA) <= t_min && !hit_min)
+    {
+        passer = 1;
+        digitalWrite(activator1, HIGH);
+        digitalWrite(activator2, HIGH);
+        hit_min = true;
+        hit_max = false;
+        Serial.println("Heater On");
+        
+    }
+  }
+
+void system_status(){
+
+  Serial.print(" Digipot Position is: ");
+  Serial.print(digi_position);
+  Serial.print("Optic Integer [0-1024]: ");
+  Serial.print()
 }
