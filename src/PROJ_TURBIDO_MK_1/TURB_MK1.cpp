@@ -100,7 +100,7 @@ float push_temp; // Value to set the temperature setting of the pump
 
 bool inter_on = false; // used to revert back to main program feed back after interuppt commmands finished 
 int decider; //Helps with deciding which side program to activate
-bool data_is_running = false; // A conditional switch to true after a command 
+bool data_is_running = true; // A conditional switch to true after a command 
 bool displaying_serial = false;
 bool data_probe = false;
 //Temp mechanics
