@@ -164,26 +164,6 @@ int digiwrite(int digi_value){
   return 0;        // Ends the transaction for this specific spi device
 }
 
-void checkSD_initalize() 
-{
-  pinMode(Chip_Select_Pin, OUTPUT);
-  pinMode(HIGH_PIN,OUTPUT);
-  digitalWrite(HIGH_PIN, HIGH);
-  
-  Serial.print("Initializing SD card...");
-  if (!SD.begin(Chip_Select_Pin))
-  {                                          
-    Serial.println("initialization failed!"); // Shows a problem if the SD never acually is reconigized by arduino
-    return;
-  }
-  Serial.println("initialization done."); // Confirms Arduino SD error is not the problem
-  if (SD.exists(filename)){  // If already a file
-        SD.remove(filename); // Remove the file to stop weird confusing
-    }
-   
-  
-}
-
 int datastore_add (int place) { 
   
   buffer[place].millistime = start_time - millis();
@@ -195,34 +175,7 @@ int datastore_add (int place) {
   buffer[place].temp_baseline = ttar; //To allow comparision of the baseline temp target and the actual temperature
   buffer[place].heater_state = passer;
   place ++;
-}
-
-void initalize_t_and_relay (){ 
-
-
- 
-  pinMode(activator1,OUTPUT);
-  pinMode(activator2,OUTPUT);
-  digitalWrite(activator1,LOW);
-  digitalWrite(activator2,LOW);
-  sensors.begin();	// Start up the library
-  Serial.print("Locating devices...");
-  Serial.print("Found ");
-  int deviceCount = sensors.getDeviceCount();
-  Serial.print(deviceCount, DEC);
-  Serial.println(" devices.");
-  Serial.println("");
-  
-
-
-
-}
-
-void optics_setup(){ 
-  pinMode(slave_select_digi, OUTPUT);
-  pinMode(sensing_pin_op_amp, INPUT);
-  SPI.begin(); // Initializes the SPI bus by setting SCK, MOSI, and SS to outputs, pulling SCK and MOSI low, and SS high.
-  Serial.begin(serial_speed);
+  return 0;
 }
 
 void temp_stabilizer()
@@ -405,6 +358,10 @@ void user_choice_interface () {
 
 
 
+
+
+
+
 void setup(){
 
 
@@ -491,5 +448,11 @@ if(!SD.begin(Chip_Select_Pin)){
 
 void loop(){
 
+if(inter_on){
+
+inter_on = false;
+delay(3000);
+user_choice_interface();
+}
 
 }
