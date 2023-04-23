@@ -103,7 +103,6 @@ int decider; //Helps with deciding which side program to activate
 bool data_is_running = false; // A conditional switch to true after a command 
 bool displaying_serial = false;
 bool data_probe = false;
-
 //Temp mechanics
 int device_count; //The amout of devices that are counted of temp prboes berfore program start
 float ttar = 22; // Target temp 22 as defult 
@@ -336,6 +335,8 @@ void user_choice_interface () {
       case 5:
       
       data_probe = true;
+      
+      
       break;
 
       case 6:
@@ -455,4 +456,36 @@ delay(3000);
 user_choice_interface();
 }
 
+if(data_probe){
+data_probe = false;
+  
+  if (data_is_running){
+    
+    
+    Serial.println("File Growth Run Complete:");
+    Serial.println("You may remove SD CARD");
+    
+  } else if (!data_is_running);
+  
+  Serial.println("Beginning Data Log Do Not Remove SD Card");
+  start_time = millis();
+
+data_is_running ^= true;
+}
+
+
+/*
+if(data_is_running){
+
+
+datastore_add(place);
+  if(displaying_serial ){
+    system_status();
+  }
+  if(place == datalen-1){
+    datadump();
+    place = 0;
+  }
+}
+*/
 }
