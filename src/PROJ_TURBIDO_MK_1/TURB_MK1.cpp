@@ -297,6 +297,10 @@ attachInterrupt(digitalPinToInterrupt(IRupt), handleInterrupt, FALLING);
 }
 
 void user_choice_interface () {
+  
+  
+  Serial.flush(); // To make sure if the user presses a faulty key the program does not fail
+  
   Serial.println("\n\n\n\n\nChoose a Mode");
   Serial.println("Type 1 for Pump Control");
   Serial.println("Type 2 for Temp Control");
@@ -311,7 +315,6 @@ void user_choice_interface () {
   int decider = Serial.parseInt();
   
   switch(decider) {
-    Serial.flush(); // To make sure if the user presses a faulty key the program does not fail
     
     case 1:
       
@@ -376,6 +379,7 @@ void user_choice_interface () {
         Serial.print("Should Turn on Pump First");
         
       }
+      break;
       case 5:
       
       data_probe = true;
@@ -391,6 +395,11 @@ void user_choice_interface () {
       
       break;  
   }
+
+  Serial.println("Execution of Order Complete please wait until menu avalible again");
+  delay(1000); 
+  Serial.println("\n\n\nMenu avalible again press button to use");
+
 } 
 
 
@@ -398,66 +407,89 @@ void user_choice_interface () {
 
 void setup(){
 
-optics_setup();
-checkSD_initalize();
-initalize_pump_and_interupt();
-initalize_t_and_relay();
+
+//Now defining important pins and instances hardwired
+
+//TEMP PINS
+
+#define ONE_WIRE_BUS A3 //The busline for the three temperature sensors
+#define activator1 7 //The Relay pin for Bang Control
+#define activator2 6 //The second relay control switch for Bang Control
+
+//OPTICS AND SD
+
+#define sensing_pin_op_amp A0 //The reading for cell count corrolation
+#define slave_select_digi 9 // The slave communicator for the Digipot
+#define Chip_Select_Pin 4 // The ethernet and SD chip select pin
+#define HIGH_PIN 10 //In order for the arduino sheild to work must be present
+//PUMP CONTROL
+
+#define ENA_MotorPin 5 //Pin for PWM SPEED of PUMP MODULATION
+#define IN1 A4 //Logical Determiner for on and off
+#define IN2 A1 //Logical Determiner for on and off
+
+//Button
+
+#define IRupt 2 // The pin which opens up the menu for user interfacing
+
+// Making pinModes
+
+// Pump and interrupt
+pinMode(IRupt,INPUT_PULLUP);
+pinMode(IN1,OUTPUT);
+pinMode(IN2, OUTPUT);
+pinMode(ENA_MotorPin,OUTPUT);
+attachInterrupt(digitalPinToInterrupt(IRupt), handleInterrupt, FALLING);
+
+
+//Relay and Temp 
+
+pinMode(activator1,OUTPUT);
+pinMode(activator2,OUTPUT);
+digitalWrite(activator1,LOW);
+digitalWrite(activator2,LOW);
+
+// OD and digipot
+
+pinMode(slave_select_digi,OUTPUT);
+pinMode(sensing_pin_op_amp,INPUT);
+pinMode(HIGH_PIN,OUTPUT);
+digitalWrite(HIGH_PIN,HIGH);
+
+//Now setting up libraries and initalizing 
+
+Serial.begin(serial_speed);
+sensors.begin();
+SPI.begin();
+
+
+//SD CHECK
+if(!SD.begin(Chip_Select_Pin)){
+  Serial.print("SD Fail");
+  Serial.println("Reformatt the SD card to fix");
+
+
+}else if(SD.begin(Chip_Select_Pin)){
+
+  Serial.println("SD Pass");
+
+
+}
+
+// Temp Sensor Check
+
+  Serial.print("Locating devices...");
+  Serial.print("Found ");
+  device_count = sensors.getDeviceCount();
+  Serial.print(device_count, DEC);
+  Serial.println(" devices.");
+  Serial.println("");
 
 
 
 }
 
-void loop()  {
+void loop(){
 
-temp_stabilizer();
-if(inter_on){
-  user_choice_interface();
-  !inter_on;
-
-}
-
-
-if(displaying_serial){
-  system_status();
-}
-
-if(data_probe){
-  
-  data_is_running ^= true;
-  if(data_is_running){
-
-     if (SD.exists(filename)){  // If already a file
-        SD.remove(filename); // Remove the file to stop weird confusing
-    }
-    place = 0;
-    Serial.println("File Removed and Starting new growth Curve ");
-    start_time = millis();
-    displaying_serial = false;
-    delay(200);
-
-  }
-  if(!data_is_running){
-  
-  Serial.println("Data Run Ended you may remove the SD Card for Data Processing");
-  data_probe = false;
-
-  }
-}
-if (data_is_running){
-  delay(500);
-  if(displaying_serial){
-  system_status();
-}
-  datastore_add(place);
-
-  if( place >= datalen-1){
-    noInterrupts();
-    datadump();
-    place = 0;
-    interrupts();
-
-  }
-
-}
 
 }
