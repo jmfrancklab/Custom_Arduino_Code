@@ -264,8 +264,6 @@ void user_choice_interface () {
   Serial.flush(); // To make sure if the user presses a faulty key the program does not fail
   while (!Serial.available() && millis()- timeout <= 20000) {
 
-    if (millis()-timeout < 20000)
-    delay(100); // Wait for input
   }
   int decider = Serial.parseInt();
   
@@ -454,24 +452,24 @@ user_choice_interface();
 
 if(data_probe){
 data_probe = false;
-  
+bool skip = false;
   if (data_is_running){
-    
+    skip = true;
     
     Serial.println("File Growth Run Complete:");
     Serial.println("You may remove SD CARD");
-    data_is_running ^= true;;
-    
-  } else if (!data_is_running);
+    data_is_running = false; 
+  }
+  if (!data_is_running && !skip){
   
   Serial.println("Beginning Data Log Do Not Remove SD Card");
   start_time = millis();
 
-data_is_running ^= true;
-if(SD.exists(filename))
-
+data_is_running = true;
+if(SD.exists(filename)){
   SD.remove(filename);
-
+}
+}
 }
 
 
