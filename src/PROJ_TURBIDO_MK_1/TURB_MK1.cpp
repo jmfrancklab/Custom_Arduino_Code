@@ -417,6 +417,8 @@ digiwrite(0);
   Serial.println(" devices.");
   Serial.println("");
 
+  delay(3000);
+
 
 if(!SD.begin(Chip_Select_Pin)){
   Serial.print("SD Fail");
