@@ -420,7 +420,6 @@ if(!SD.begin(Chip_Select_Pin)){
   Serial.println(" devices.");
   Serial.println("");
 
-  delay(3000);
 
 
 
