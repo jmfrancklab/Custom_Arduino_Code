@@ -295,7 +295,7 @@ void user_choice_interface () {
       Serial.print("Set temp baseline to: ");
       Serial.print(push_temp);
       Serial.print(" C");
-      push_temp = ttar;
+      ttar = push_temp;
       break;
     case 3:
       Serial.println("Switching Pump State");
