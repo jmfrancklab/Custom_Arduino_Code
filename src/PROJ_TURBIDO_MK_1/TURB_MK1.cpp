@@ -212,7 +212,7 @@ void system_status(){
   Serial.print("\n Pump Speed");
   Serial.println(push_pump);
   Serial.print("\n Temp Baseline: ");
-  Serial.print(ttar);
+  Serial.println(ttar);
   sensors.requestTemperatures();
   Serial.print("Sensor A: ");
   Serial.print(sensors.getTempC(sensorA));
@@ -224,7 +224,7 @@ void system_status(){
   Serial.print(" [C] ,");
   Serial.print(" Sensor C: ");
   Serial.print(sensors.getTempC(sensorC));
-  Serial.print(" [C] ");
+  Serial.println(" [C] ");
 
   Serial.println("At time:  ");
   Serial.print(millis()/60000);
@@ -422,6 +422,7 @@ SPI.begin();
 
 
 //SD CHECK
+/*=
 if(!SD.begin(Chip_Select_Pin)){
   Serial.print("SD Fail");
   Serial.println("Reformatt the SD card to fix");
@@ -433,6 +434,7 @@ if(!SD.begin(Chip_Select_Pin)){
 
 
 }
+*/
 
 // Temp Sensor Check
 
@@ -474,7 +476,7 @@ data_is_running ^= true;
 }
 
 
-/*
+
 if(data_is_running){
 
 
@@ -484,8 +486,9 @@ datastore_add(place);
   }
   if(place == datalen-1){
     datadump();
+    temp_stabilizer();
     place = 0;
   }
 }
-*/
+
 }
