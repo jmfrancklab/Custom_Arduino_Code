@@ -11,14 +11,14 @@
 
 //TEMP PINS
 
-#define ONE_WIRE_BUS A3 //The busline for the three temperature sensors
+#define ONE_WIRE_BUS 3 //The busline for the three temperature sensors
 #define activator1 7 //The Relay pin for Bang Control
 #define activator2 6 //The second relay control switch for Bang Control
 
 //OPTICS AND SD
 
 #define sensing_pin_op_amp A0 //The reading for cell count corrolation
-#define slave_select_digi 9 // The slave communicator for the Digipot
+#define slave_select_digi 53 // The slave communicator for the Digipot
 #define Chip_Select_Pin 4 // The ethernet and SD chip select pin
 #define HIGH_PIN 10 //In order for the arduino sheild to work must be present
 //PUMP CONTROL
@@ -100,7 +100,7 @@ float push_temp; // Value to set the temperature setting of the pump
 
 bool inter_on = false; // used to revert back to main program feed back after interuppt commmands finished 
 int decider; //Helps with deciding which side program to activate
-bool data_is_running = true; // A conditional switch to true after a command 
+bool data_is_running = false; // A conditional switch to true after a command 
 bool displaying_serial = false;
 bool data_probe = false;
 //Temp mechanics
@@ -394,18 +394,20 @@ digitalWrite(HIGH_PIN,OUTPUT);
 
 Serial.begin(serial_speed);
 sensors.begin();
-
-
-
-
 SPI.begin();
-digiwrite(0);
-delay(3000);
-digiwrite(100);
-delay(3000);
-digiwrite(0);
 
 
+if(!SD.begin(Chip_Select_Pin)){
+  Serial.print("SD Fail");
+  Serial.println("Reformat the SD card to fix");
+
+
+}else if(SD.begin(Chip_Select_Pin)){
+
+  Serial.println("SD Pass");
+
+
+}
 
 
 
@@ -421,17 +423,7 @@ digiwrite(0);
   delay(3000);
 
 
-if(!SD.begin(Chip_Select_Pin)){
-  Serial.print("SD Fail");
-  Serial.println("Reformatt the SD card to fix");
 
-
-}else if(SD.begin(Chip_Select_Pin)){
-
-  Serial.println("SD Pass");
-
-
-}
 
 
 
