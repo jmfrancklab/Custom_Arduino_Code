@@ -392,8 +392,8 @@ digitalWrite(HIGH_PIN,HIGH);
 //Now setting up libraries and initalizing 
 
 Serial.begin(serial_speed);
-sensors.begin();
 
+SPI.begin();
 SD.begin(Chip_Select_Pin);
 
 
