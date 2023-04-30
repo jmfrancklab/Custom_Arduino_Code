@@ -182,8 +182,8 @@ void temp_stabilizer()
         passer = 0;
         digitalWrite(activator1, LOW);
         digitalWrite(activator2, LOW);
-        hit_max = true;
-        hit_min = false;
+        hit_max ^= true;
+        
         Serial.println("Heater Off");
         
 
@@ -194,8 +194,8 @@ void temp_stabilizer()
         passer = 1;
         digitalWrite(activator1, HIGH);
         digitalWrite(activator2, HIGH);
-        hit_min = true;
-        hit_max = false;
+        hit_min ^= true;
+        
         Serial.println("Heater On");
         
     }
@@ -299,8 +299,9 @@ void user_choice_interface () {
       Serial.print(push_temp);
       Serial.print(" C");
       ttar = push_temp;
-      hit_min = false;
-      hit_max = false;
+      t_max = ttar + tolorance; // The tolorances for each constraint
+      t_min = ttar - tolorance; // The tolorances for each constraint
+      temp_stabilizer();
       break;
     case 3:
       Serial.println("Switching Pump State");
