@@ -393,6 +393,12 @@ digitalWrite(HIGH_PIN,HIGH);
 
 Serial.begin(serial_speed);
 sensors.begin();
+SPI.begin();
+digiwrite(0);
+delay(3000);
+digiwrite(100);
+delay(3000);
+digiwrite(0);
 
 
 
