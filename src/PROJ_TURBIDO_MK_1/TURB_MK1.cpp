@@ -81,7 +81,7 @@ File MYDATA; //Created an instance of the open file
 
 //SD variables and Structure variables
 
-const int datalen = 20; //The size of the data structure which is pushed into the SD card
+const int datalen = 30; //The size of the data structure which is pushed into the SD card
 datalog buffer[datalen]; // Size off each struct or... amount of time it takes to dump data to SD NOTE MUST BE CONST INT
 const char *filename = "DATAREC.dat"; // The name of the file IMPORTANT CANNOT HAVE  more than 8 character within the name must follow the file naming system FAT 32
 int place = 0; // The place is set to zero or one of the 20 slots within the structre since again, 0 is the first structure storage space
@@ -130,7 +130,7 @@ void datadump()
 
 {
   
-  MYDATA= SD.open(filename,FILE_WRITE);
+  MYDATA = SD.open(filename,FILE_WRITE);
   data_wrote = MYDATA.write((const uint8_t *)buffer, sizeof(buffer)); // Writing to the file
   MYDATA.seek(EOF);
   Serial.print("Wrote: ");
@@ -141,11 +141,11 @@ void datadump()
   Serial.print("The name of the file is: ");
   Serial.println(MYDATA.name());
   Serial.print("Size of Structure: ");
-  Serial.println(sizeof(buffer));
+  Serial.print(sizeof(buffer));
   Serial.print("Position of the file is: ");
-  Serial.println(MYDATA.position());
+  Serial.print(MYDATA.position());
   Serial.print("The file Exist? ");
-  Serial.println(SD.exists(filename));
+  Serial.print(SD.exists(filename));
   Serial.print("The size of the file is now: ");
   Serial.println(MYDATA.size());
   MYDATA.close();
@@ -163,7 +163,7 @@ int digiwrite(int digi_value){
   return 0;        // Ends the transaction for this specific spi device
 }
 
-int datastore_add (int place) { 
+void datastore_add (){ 
   
   buffer[place].millistime = start_time - millis();
   buffer[place].Voltage_analog_input = analogRead(sensing_pin_op_amp); // Analog Reading of OD
@@ -173,8 +173,6 @@ int datastore_add (int place) {
   buffer[place].pump_speed_setting = //Keeps a record of the pump speed
   buffer[place].temp_baseline = ttar; //To allow comparision of the baseline temp target and the actual temperature
   buffer[place].heater_state = passer;
-  place ++;
-  return 0;
 }
 
 void temp_stabilizer()
@@ -205,14 +203,14 @@ void temp_stabilizer()
 
 void system_status(){  
 
-  Serial.print(" Digipot Position is: ");
-  Serial.println(digi_position);
-  Serial.print("Optic Integer [0-1024]: ");
-  Serial.println(analogRead(sensing_pin_op_amp));
-  Serial.print("\n Pump Speed");
-  Serial.println(push_pump);
-  Serial.print("\n Temp Baseline: ");
-  Serial.println(ttar);
+  Serial.println(" Digipot Position is: ");
+  Serial.print(digi_position);
+  Serial.println("Optic Integer [0-1024]: ");
+  Serial.print(analogRead(sensing_pin_op_amp));
+  Serial.println("\n Pump Speed");
+  Serial.print(push_pump);
+  Serial.println("\n Temp Baseline: ");
+  Serial.print(ttar);
   sensors.requestTemperatures();
   Serial.print("Sensor A: ");
   Serial.print(sensors.getTempC(sensorA));
@@ -229,6 +227,8 @@ void system_status(){
   Serial.println("At time:  ");
   Serial.print(millis()/60000);
   Serial.print(" Minutes ");
+  Serial.print("Structure position: ");
+  Serial.print(place);
 
   
 
@@ -249,7 +249,7 @@ attachInterrupt(digitalPinToInterrupt(IRupt), handleInterrupt, FALLING);
 }
 
 void user_choice_interface () {
-  
+  int timeout = millis();
   
   Serial.flush(); // To make sure if the user presses a faulty key the program does not fail
   
@@ -260,8 +260,11 @@ void user_choice_interface () {
   Serial.println("Type 4 for Pump Direction Switch");
   Serial.println("Type 5 to start or end a recording program ");
   Serial.println("Type 6 to Start or Stop Live data feed");
+  
+  Serial.flush(); // To make sure if the user presses a faulty key the program does not fail
+  while (!Serial.available() && millis()- timeout <20000) {
 
-  while (!Serial.available()) {
+    if (millis()-timeout < 20000)
     delay(100); // Wait for input
   }
   int decider = Serial.parseInt();
@@ -296,6 +299,8 @@ void user_choice_interface () {
       Serial.print(push_temp);
       Serial.print(" C");
       ttar = push_temp;
+      hit_min = false;
+      hit_max = false;
       break;
     case 3:
       Serial.println("Switching Pump State");
@@ -409,6 +414,15 @@ if(!SD.begin(Chip_Select_Pin)){
 
 }
 
+delay(2000);
+digiwrite(0);
+delay(2000);
+digiwrite(100);
+delay(3000);
+digiwrite(0);
+delay(2000);
+
+
 
 
 // Temp Sensor Check
@@ -445,6 +459,7 @@ data_probe = false;
     
     Serial.println("File Growth Run Complete:");
     Serial.println("You may remove SD CARD");
+    data_is_running ^= true;;
     
   } else if (!data_is_running);
   
@@ -452,6 +467,10 @@ data_probe = false;
   start_time = millis();
 
 data_is_running ^= true;
+if(SD.exists(filename))
+
+  SD.remove(filename);
+
 }
 
 
@@ -459,7 +478,10 @@ data_is_running ^= true;
 if(data_is_running){
 
 
-datastore_add(place);
+datastore_add();
+place ++;
+delay(250);
+
   if(displaying_serial ){
     system_status();
   }
