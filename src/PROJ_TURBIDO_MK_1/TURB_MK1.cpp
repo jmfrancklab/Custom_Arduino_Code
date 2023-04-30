@@ -407,7 +407,16 @@ digiwrite(0);
 
 
 
-//SD CHECK
+
+// Temp Sensor Check
+
+  Serial.print("Locating devices...");
+  Serial.print("Found ");
+  device_count = sensors.getDeviceCount();
+  Serial.print(device_count, DEC);
+  Serial.println(" devices.");
+  Serial.println("");
+
 
 if(!SD.begin(Chip_Select_Pin)){
   Serial.print("SD Fail");
@@ -420,17 +429,6 @@ if(!SD.begin(Chip_Select_Pin)){
 
 
 }
-
-
-
-// Temp Sensor Check
-
-  Serial.print("Locating devices...");
-  Serial.print("Found ");
-  device_count = sensors.getDeviceCount();
-  Serial.print(device_count, DEC);
-  Serial.println(" devices.");
-  Serial.println("");
 
 
 
