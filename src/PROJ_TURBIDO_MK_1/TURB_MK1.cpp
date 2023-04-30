@@ -262,7 +262,7 @@ void user_choice_interface () {
   Serial.println("Type 6 to Start or Stop Live data feed");
   
   Serial.flush(); // To make sure if the user presses a faulty key the program does not fail
-  while (!Serial.available() && millis()- timeout <20000) {
+  while (!Serial.available() && millis()- timeout > 20000) {
 
     if (millis()-timeout < 20000)
     delay(100); // Wait for input
