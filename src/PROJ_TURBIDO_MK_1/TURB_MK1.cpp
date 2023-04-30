@@ -365,31 +365,6 @@ void user_choice_interface () {
 
 void setup(){
 
-
-//Now defining important pins and instances hardwired
-
-//TEMP PINS
-
-#define ONE_WIRE_BUS A3 //The busline for the three temperature sensors
-#define activator1 7 //The Relay pin for Bang Control
-#define activator2 6 //The second relay control switch for Bang Control
-
-//OPTICS AND SD
-
-#define sensing_pin_op_amp A0 //The reading for cell count corrolation
-#define slave_select_digi 9 // The slave communicator for the Digipot
-#define Chip_Select_Pin 4 // The ethernet and SD chip select pin
-#define HIGH_PIN 10 //In order for the arduino sheild to work must be present
-//PUMP CONTROL
-
-#define ENA_MotorPin 5 //Pin for PWM SPEED of PUMP MODULATION
-#define IN1 A4 //Logical Determiner for on and off
-#define IN2 A1 //Logical Determiner for on and off
-
-//Button
-
-#define IRupt 2 // The pin which opens up the menu for user interfacing
-
 // Making pinModes
 
 // Pump and interrupt
@@ -419,6 +394,7 @@ digitalWrite(HIGH_PIN,HIGH);
 Serial.begin(serial_speed);
 sensors.begin();
 SPI.begin();
+SD.begin(Chip_Select_Pin);
 
 
 //SD CHECK
