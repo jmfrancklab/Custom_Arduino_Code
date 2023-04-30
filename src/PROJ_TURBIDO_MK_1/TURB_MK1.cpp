@@ -394,11 +394,11 @@ digitalWrite(HIGH_PIN,HIGH);
 Serial.begin(serial_speed);
 
 SPI.begin();
-SD.begin(Chip_Select_Pin);
+
 
 
 //SD CHECK
-/*=
+
 if(!SD.begin(Chip_Select_Pin)){
   Serial.print("SD Fail");
   Serial.println("Reformatt the SD card to fix");
@@ -410,7 +410,7 @@ if(!SD.begin(Chip_Select_Pin)){
 
 
 }
-*/
+
 
 // Temp Sensor Check
 
