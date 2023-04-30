@@ -387,6 +387,7 @@ digitalWrite(activator2,LOW);
 pinMode(slave_select_digi,OUTPUT);
 pinMode(sensing_pin_op_amp,INPUT);
 pinMode(HIGH_PIN,OUTPUT);
+digitalWrite(HIGH_PIN,OUTPUT);
 
 
 //Now setting up libraries and initalizing 
