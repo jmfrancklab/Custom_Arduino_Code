@@ -393,7 +393,7 @@ digitalWrite(HIGH_PIN,HIGH);
 
 Serial.begin(serial_speed);
 
-SPI.begin();
+
 
 
 
