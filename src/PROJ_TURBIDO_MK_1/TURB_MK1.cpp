@@ -392,6 +392,7 @@ digitalWrite(HIGH_PIN,OUTPUT);
 Serial.begin(serial_speed);
 sensors.begin();
 SPI.begin();
+Serial.setTimeout(15000);
 
 
 if(!SD.begin(Chip_Select_Pin)){
