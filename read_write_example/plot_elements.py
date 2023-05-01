@@ -1,10 +1,10 @@
 from pylab import *
 
-
+filename = "DATAREC.dat"
 
 mytype = dtype([    ("millistime","<u4"),    ("microtime","<u4"),    ("Voltage_analog_input","<f4"),    ("digi_pot_wiper_position","<u4")])
 
-result = fromfile("INF_test.DAT", dtype=mytype)
+result = fromfile(filename, dtype=mytype)
 
 plot(result["digi_pot_wiper_position"], result["Voltage_analog_input"], "o")
 

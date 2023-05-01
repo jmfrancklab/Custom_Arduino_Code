@@ -81,7 +81,7 @@ File MYDATA; //Created an instance of the open file
 
 //SD variables and Structure variables
 
-const int datalen = 30; //The size of the data structure which is pushed into the SD card
+const int datalen = 40; //The size of the data structure which is pushed into the SD card
 datalog buffer[datalen]; // Size off each struct or... amount of time it takes to dump data to SD NOTE MUST BE CONST INT
 const char *filename = "DATAREC.dat"; // The name of the file IMPORTANT CANNOT HAVE  more than 8 character within the name must follow the file naming system FAT 32
 int place = 0; // The place is set to zero or one of the 20 slots within the structre since again, 0 is the first structure storage space
@@ -182,7 +182,8 @@ void temp_stabilizer()
         passer = 0;
         digitalWrite(activator1, LOW);
         digitalWrite(activator2, LOW);
-        hit_max ^= true;
+        hit_max =true;
+        hit_min = false;
         
         Serial.println("Heater Off");
         
@@ -194,7 +195,8 @@ void temp_stabilizer()
         passer = 1;
         digitalWrite(activator1, HIGH);
         digitalWrite(activator2, HIGH);
-        hit_min ^= true;
+        hit_min = true;
+        hit_max = false;
         
         Serial.println("Heater On");
         
@@ -262,7 +264,7 @@ void user_choice_interface () {
   Serial.println("Type 6 to Start or Stop Live data feed");
   
   Serial.flush(); // To make sure if the user presses a faulty key the program does not fail
-  while (!Serial.available() && millis()- timeout <= 20000) {
+  while (millis()- timeout <= 6000) {
 
   }
   int decider = Serial.parseInt();
