@@ -371,24 +371,6 @@ void setup()
   sensors.begin();
   SPI.begin();
 
-  if (!SD.begin(Chip_Select_Pin))
-  {
-    Serial.print("SD Fail");
-    Serial.println("Reformat the SD card to fix");
-  }
-  else if (SD.begin(Chip_Select_Pin))
-  {
-
-    Serial.println("SD Pass");
-  }
-
-  delay(2000);
-  digiwrite(0);
-  delay(2000);
-  digiwrite(100);
-  delay(3000);
-  digiwrite(0);
-  delay(2000);
 
   // Temp Sensor Check
 
@@ -418,17 +400,28 @@ void loop()
     if (data_is_running)
     {
       skip = true;
-
+      data_is_running ^= true;
+      SD.end();
       Serial.println("File Growth Run Complete:");
       Serial.println("You may remove SD CARD");
-      data_is_running = false;
+      
     }
     if (!data_is_running && !skip)
     {
+      if (!SD.begin(Chip_Select_Pin))
+  {
+    Serial.print("SD Fail");
+    Serial.println("Reformat the SD card to fix");
+  }
+  else if (SD.begin(Chip_Select_Pin))
+  {
 
+    Serial.println("SD Pass");
+  }
       Serial.println("Beginning Data Log Do Not Remove SD Card");
       start_time = millis();
-      data_is_running = true;
+      data_is_running ^= true;
+      skip = true;
       place = 0;
 
       if (SD.exists(filename))
