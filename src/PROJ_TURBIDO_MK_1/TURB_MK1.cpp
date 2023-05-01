@@ -165,7 +165,7 @@ int digiwrite(int digi_value){
 
 void datastore_add (){ 
   
-  buffer[place].millistime = start_time - millis();
+  buffer[place].millistime = millis()-start_time;
   buffer[place].Voltage_analog_input = analogRead(sensing_pin_op_amp); // Analog Reading of OD
   buffer[place].digi_pot_wiper_position = digi_position; // Where the digipot is
   buffer[place].T_Water = sensors.getTempC(sensorA); // Temp Values
