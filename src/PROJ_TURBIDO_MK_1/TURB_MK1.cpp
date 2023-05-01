@@ -72,7 +72,7 @@ File MYDATA; //Created an instance of the open file
 
 //SD variables and Structure variables
 
-const int datalen = 40; //The size of the data structure which is pushed into the SD card
+const int datalen = 20; //The size of the data structure which is pushed into the SD card
 datalog buffer[datalen]; // Size off each struct or... amount of time it takes to dump data to SD NOTE MUST BE CONST INT
 const char *filename = "DATAREC.dat"; // The name of the file IMPORTANT CANNOT HAVE  more than 8 character within the name must follow the file naming system FAT 32
 int place = 0; // The place is set to zero or one of the 20 slots within the structre since again, 0 is the first structure storage space
