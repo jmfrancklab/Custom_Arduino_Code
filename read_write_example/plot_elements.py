@@ -14,7 +14,8 @@ mytype = dtype([("millistime","<u4"),
                 ("heater_state", "<u4")])
 
 result = fromfile(filename, dtype=mytype)
-
+for i in range(4220):
+    print(result[i])
 
 plot(result["millistime"], result["digi_pot_wiper_position"],"--")
 xlabel("Time [mms]")
