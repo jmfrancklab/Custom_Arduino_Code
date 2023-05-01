@@ -255,7 +255,7 @@ void user_choice_interface () {
   Serial.println("Type 6 to Start or Stop Live data feed");
   
   Serial.flush(); // To make sure if the user presses a faulty key the program does not fail
-  while (millis()- timeout <= 6000) {
+  while (!Serial.available()) {
 
   }
   int decider = Serial.parseInt();
@@ -392,7 +392,7 @@ digitalWrite(HIGH_PIN,OUTPUT);
 Serial.begin(serial_speed);
 sensors.begin();
 SPI.begin();
-Serial.setTimeout(15000);
+Serial.setTimeout(7000);
 
 
 if(!SD.begin(Chip_Select_Pin)){
