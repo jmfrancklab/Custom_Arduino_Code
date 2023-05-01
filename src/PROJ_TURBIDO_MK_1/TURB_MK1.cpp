@@ -428,8 +428,9 @@ void loop()
 
       Serial.println("Beginning Data Log Do Not Remove SD Card");
       start_time = millis();
-
       data_is_running = true;
+      place = 0;
+
       if (SD.exists(filename))
       {
         SD.remove(filename);
@@ -448,7 +449,7 @@ void loop()
     {
       system_status();
     }
-    if (place == datalen - 1)
+    if (place > datalen-1 )
     {
       datadump();
       temp_stabilizer();
