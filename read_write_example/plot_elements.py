@@ -1,16 +1,25 @@
 from pylab import *
 
+
+
 filename = "DATAREC.dat"
 
-mytype = dtype([    ("millistime","<u4"),    ("microtime","<u4"),    ("Voltage_analog_input","<f4"),    ("digi_pot_wiper_position","<u4")])
+mytype = dtype([("millistime","<u4"), 
+                ("Voltage_analog_input","<u4"),  
+                ("digi_pot_wiper_position","<u4"),    
+                ("T_Water", "f4"),
+                ("T_average_of_Al_Block", "f4"),
+                ("pump_speed_setting", "u4"),
+                ("temp_baseline","f4"),
+                ("heater_state", "u4")])
 
 result = fromfile(filename, dtype=mytype)
 
-plot(result["digi_pot_wiper_position"], result["Voltage_analog_input"], "o")
+plot(result["millistime"], result["Voltage_analog_input"], "o")
 
-xlabel('PW0 Position [0-100]')
+xlabel('Time [mms]')
 ylabel('Voltage Analog Int [0-1024]')
-title('PW0 Position vs. Analog Reading')
+title('Voltage Analog Reading vs Time')
 figure()
 
 plot(result["millistime"], result["digi_pot_wiper_position"],"o")
@@ -26,11 +35,11 @@ xlabel("Time [mms]")
 ylabel("Analog [0-1024]")
 
 figure()
-plot(result["microtime"], result["Voltage_analog_input"], "o")
+plot(result["millistime"], result["T_average_of_Al_Block"], "o")
 
-xlabel('Microtime')
-ylabel('Voltage Analog Int [0-1024]')
-title('Microtime vs. Analog Reading')
+xlabel('Time [mms]')
+ylabel('Temperature [C]')
+title('Temp vs. Time (avg)')
 
 
 

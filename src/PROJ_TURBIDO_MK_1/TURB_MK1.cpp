@@ -49,24 +49,15 @@ const uint8_t sensorC[8] = {0x28, 0x10, 0x0A, 0x94, 0x97, 0x0A, 0x03, 0x40};
 
 SPISettings mySetting(16000000, MSBFIRST, SPI_MODE0); // Defining the SPI SETTINGS
 
-struct datalog { 
-  
-  //For temp data
-  
-  float T_Water;
-  float T_average_of_Al_Block; 
+struct datalog {
   unsigned long int millistime;
+  float Voltage_analog_input;
+  unsigned long int digi_pot_wiper_position;
+  float T_Water;
+  float T_average_of_Al_Block;
+  unsigned long int pump_speed_setting;
+  float temp_baseline;
   unsigned long int heater_state;
-
-    //For OD and Digipot Data
-  float Voltage_analog_input;   // The analog input single from the OD sensor
-  unsigned long int digi_pot_wiper_position;  // The digipot wiping position
-
-  //For pump 
-
-  unsigned long int pump_speed_setting; //Keeps a record of the pump speed
-  float temp_baseline; //To allow comparision of the baseline temp target and the actual temperature
-
 };
 
 File MYDATA; //Created an instance of the open file
