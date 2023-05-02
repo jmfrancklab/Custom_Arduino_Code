@@ -144,7 +144,7 @@ int digiwrite(int digi_value)
 void datastore_add()
 {
 
-  buffer[place].millistime = millis() - start_time;
+  buffer[place].millistime = (millis() - start_time);
   buffer[place].Voltage_analog_input = analogRead(sensing_pin_op_amp);                               // Analog Reading of OD
   buffer[place].digi_pot_wiper_position = digi_position;                                             // Where the digipot is
   buffer[place].T_Water = sensors.getTempC(sensorA);                                                 // Temp Values
@@ -401,19 +401,23 @@ void loop()
     {
       skip = true;
       data_is_running ^= true;
+      ttar = 22;
+      temp_stabilizer();
       SD.end();
       Serial.println("File Growth Run Complete:");
       Serial.println("You may remove SD CARD");
+
+
       
     }
     if (!data_is_running && !skip)
     {
-      if (!SD.begin(Chip_Select_Pin))
-  {
-    Serial.print("SD Fail");
-    Serial.println("Reformat the SD card to fix");
-  }
-  else if (SD.begin(Chip_Select_Pin))
+          if (!SD.begin(Chip_Select_Pin))
+      {
+        Serial.print("SD Fail");
+        Serial.println("Reformat the SD card to fix");
+      }
+      else if (SD.begin(Chip_Select_Pin))
   {
 
     Serial.println("SD Pass");
