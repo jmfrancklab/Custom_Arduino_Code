@@ -160,14 +160,7 @@ void datastore_add(){
 void temp_stabilizer()
 {
   
-  if(sensors.getTempC(sensorA) < t_max-0.125 && sensors.getTempC(sensorA)> t_min + 0.125 ){
-    hit_max = false;
-    hit_min = false;
-  }
-  
-  
-  
-  if (sensors.getTempC(sensorA) >= t_max && !hit_max)
+  if ((sensors.getTempC(sensorC)+sensors.getTempC(sensorB))/2 >= t_max && !hit_max)
   {
     passer = 0;
     digitalWrite(activator1, LOW);
@@ -177,7 +170,7 @@ void temp_stabilizer()
 
     Serial.println("Heater Off");
   }
-  else if (sensors.getTempC(sensorA) <= t_min && !hit_min)
+  if ((sensors.getTempC(sensorC)+sensors.getTempC(sensorB))/2 <= t_min && !hit_min)
   {
     passer = 1;
     digitalWrite(activator1, HIGH);
