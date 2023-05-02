@@ -12,6 +12,7 @@ mytype = dtype([("millistime","<u4"),
                 ("heater_state", "<u4")])
 
 result = fromfile(filename, dtype=mytype)
+result["millistime"] -= result["millistime"][0]
 
 fig, axs = subplots(2, 3, figsize=(18, 8))
 
