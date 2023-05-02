@@ -1,0 +1,22 @@
+{
+    "fileViewType": "tree",
+    "includeCommitsMentionedByReflogs": true,
+    "onlyFollowFirstParent": true,
+    "onRepoLoadShowCheckedOutBranch": true,
+    "onRepoLoadShowSpecificBranches": [],
+    "pullRequestConfig": {
+        "provider": "github",
+        "hostRootUrl": "https://github.com",
+        "sourceRemote": "origin",
+        "sourceOwner": "jmfrancklab",
+        "sourceRepo": "Custom_Arduino_Code",
+        "destRemote": "origin",
+        "destOwner": "jmfrancklab",
+        "destRepo": "Custom_Arduino_Code",
+        "destProjectId": "",
+        "destBranch": "master",
+        "custom": null
+    },
+    "showRemoteBranches": true,
+    "exportedAt": 1682989918813
+}
