@@ -57,6 +57,7 @@ struct datalog
   unsigned long int pump_speed_setting;
   float temp_baseline;
   unsigned long int heater_state;
+  unsigned long int microtime;
 };
 
 File MYDATA; // Created an instance of the open file
@@ -86,6 +87,7 @@ int decider;                  // Helps with deciding which side program to activ
 bool data_is_running = false; // A conditional switch to true after a command
 bool displaying_serial = false;
 bool data_probe = false;
+bool switcher = false;
 // Temp mechanics
 int device_count; // The amout of devices that are counted of temp prboes berfore program start
 float ttar = 22;  // Target temp 22 as defult
@@ -148,9 +150,10 @@ void datastore_add(){
   buffer[place].digi_pot_wiper_position = digi_position;                                             // Where the digipot is
   buffer[place].T_Water = sensors.getTempC(sensorA);                                                 // Temp Values
   buffer[place].T_average_of_Al_Block = (sensors.getTempC(sensorB) + sensors.getTempC(sensorC)) / 2; // Temp value
-  buffer[place].pump_speed_setting =                                                                 // Keeps a record of the pump speed
+  buffer[place].pump_speed_setting = push_pump;                                                        // Keeps a record of the pump speed
   buffer[place].temp_baseline = ttar;                                                            // To allow comparision of the baseline temp target and the actual temperature
   buffer[place].heater_state = passer;
+  buffer[place].microtime = micros();
   
 }
 
@@ -261,6 +264,7 @@ void user_choice_interface()
     analogWrite(ENA_MotorPin, push_pump);
     Serial.print("Pump set to analog setting of: ");
     Serial.print(push_pump);
+    
 
     break;
   case 2:
@@ -402,7 +406,8 @@ void loop()
       skip = true;
       data_is_running ^= true;
       ttar = 22;
-      temp_stabilizer();
+      digitalWrite(activator1,LOW);
+      digitalWrite(activator2, LOW);
       SD.end();
       Serial.println("File Growth Run Complete:");
       Serial.println("You may remove SD CARD");
@@ -436,7 +441,10 @@ void loop()
 
   if (data_is_running)
   {
-
+    if(switcher){
+      digiwrite(15);
+    }
+    
     datastore_add();
     place++;
     delay(250);
@@ -450,6 +458,7 @@ void loop()
       datadump();
       temp_stabilizer();
       place = 0;
+      switcher ^= true;
     }
   }
 }

@@ -9,10 +9,12 @@ mytype = dtype([("millistime","<u4"),
                 ("T_average_of_Al_Block", "<f4"),
                 ("pump_speed_setting", "<u4"),
                 ("temp_baseline","<f4"),
-                ("heater_state", "<u4")])
+                ("heater_state", "<u4"),
+                ("microtime", "<u4")])
 
 result = fromfile(filename, dtype=mytype)
 result["millistime"] -= result["millistime"][0]
+result["microtime"] -= result["microtime"][0]
 
 fig, axs = subplots(2, 3, figsize=(18, 8))
 
@@ -48,7 +50,15 @@ axs[1, 1].set_ylabel("pump speed 0-255")
 axs[1, 1].set_title("Time vs. Pump Speed")
 axs[1, 1].legend()
 
-axs[1, 2].axis('off')  # Add an empty subplot to keep the layout
+axs[1, 2].plot(result["microtime"], result["Voltage_analog_input"] ,"--")
+axs[1, 2].set_xlabel("Time [us]")
+axs[1, 2].set_ylabel("Voltage analog Input")
+axs[1, 2].set_title("Fine Time vs Voltage Analog Input")
+axs[1, 2].legend()
+
+
+
+
 
 fig.tight_layout()
 show()
