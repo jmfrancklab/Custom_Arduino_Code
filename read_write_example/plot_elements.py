@@ -61,7 +61,11 @@ axs[1, 1].set_ylabel("pump speed 0-255")
 axs[1, 1].set_title("Time vs. Pump Speed")
 axs[1, 1].legend()
 
-axs[1, 2].axis('off')  # Add an empty subplot to keep the layout
+
+axs[1, 2].plot(result["microtime"], result["Voltage_analog_input"])
+axs[1, 2].set_xlabel("Time [us]")
+axs[1, 2].set_ylabel("Voltage Analog Input")
+axs[1, 2].set_title("Time vs. OD Sensing")
 
 fig.tight_layout()
 show()
