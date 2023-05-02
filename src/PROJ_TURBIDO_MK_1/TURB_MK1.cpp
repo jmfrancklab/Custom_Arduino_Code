@@ -141,10 +141,9 @@ int digiwrite(int digi_value)
   return 0; // Ends the transaction for this specific spi device
 }
 
-void datastore_add()
-{
+void datastore_add(){
 
-  buffer[place].millistime = (millis() - start_time);
+  buffer[place].millistime = millis();
   buffer[place].Voltage_analog_input = analogRead(sensing_pin_op_amp);                               // Analog Reading of OD
   buffer[place].digi_pot_wiper_position = digi_position;                                             // Where the digipot is
   buffer[place].T_Water = sensors.getTempC(sensorA);                                                 // Temp Values
@@ -152,6 +151,7 @@ void datastore_add()
   buffer[place].pump_speed_setting =                                                                 // Keeps a record of the pump speed
   buffer[place].temp_baseline = ttar;                                                            // To allow comparision of the baseline temp target and the actual temperature
   buffer[place].heater_state = passer;
+  
 }
 
 void temp_stabilizer()
@@ -423,7 +423,6 @@ void loop()
     Serial.println("SD Pass");
   }
       Serial.println("Beginning Data Log Do Not Remove SD Card");
-      start_time = millis();
       data_is_running ^= true;
       skip = true;
       place = 0;
