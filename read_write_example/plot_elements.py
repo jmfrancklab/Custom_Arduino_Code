@@ -11,12 +11,21 @@ mytype = dtype([
     ("pump_speed_setting", "<u4"),
     ("temp_baseline", "<f4"),
     ("heater_state", "<u4"),
+    ("microtime","<u4"),
 ])
 
 result = fromfile(filename, dtype=mytype)
+for i in range(size(result)):
+    print
 
 # Shift millis to start at 0
 result["millistime"] = result["millistime"] - result["millistime"][0]
+
+
+for i in range(size(result)):
+    print(result[i])
+
+
 
 fig, axs = subplots(2, 3, figsize=(18, 8))
 

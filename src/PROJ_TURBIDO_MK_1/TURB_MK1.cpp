@@ -87,7 +87,7 @@ int decider;                  // Helps with deciding which side program to activ
 bool data_is_running = false; // A conditional switch to true after a command
 bool displaying_serial = false;
 bool data_probe = false;
-bool switcher = false;
+bool switcher = true;
 // Temp mechanics
 int device_count; // The amout of devices that are counted of temp prboes berfore program start
 float ttar = 22;  // Target temp 22 as defult
@@ -140,7 +140,7 @@ int digiwrite(int digi_value)
   SPI.transfer(digi_value);
   digitalWrite(slave_select_digi, HIGH); // Switching recieving bit back to zero
   SPI.endTransaction();
-  return 0; // Ends the transaction for this specific spi device
+  return digi_value; // Ends the transaction for this specific spi device
 }
 
 void datastore_add(){
@@ -159,13 +159,21 @@ void datastore_add(){
 
 void temp_stabilizer()
 {
+  
+  if(sensors.getTempC(sensorA) < t_max-0.125 && sensors.getTempC(sensorA)> t_min + 0.125 ){
+    hit_max = false;
+    hit_min = false;
+  }
+  
+  
+  
   if (sensors.getTempC(sensorA) >= t_max && !hit_max)
   {
     passer = 0;
     digitalWrite(activator1, LOW);
     digitalWrite(activator2, LOW);
     hit_max = true;
-    hit_min = false;
+  
 
     Serial.println("Heater Off");
   }
@@ -175,7 +183,7 @@ void temp_stabilizer()
     digitalWrite(activator1, HIGH);
     digitalWrite(activator2, HIGH);
     hit_min = true;
-    hit_max = false;
+    
 
     Serial.println("Heater On");
   }
@@ -407,7 +415,7 @@ void loop()
       data_is_running ^= true;
       ttar = 22;
       digitalWrite(activator1,LOW);
-      digitalWrite(activator2, LOW);
+      digitalWrite(activator2,LOW);
       SD.end();
       Serial.println("File Growth Run Complete:");
       Serial.println("You may remove SD CARD");
@@ -442,7 +450,11 @@ void loop()
   if (data_is_running)
   {
     if(switcher){
-      digiwrite(15);
+      
+      digi_position = digiwrite(15);
+
+    }else{
+      digi_position = digiwrite(0);
     }
     
     datastore_add();
