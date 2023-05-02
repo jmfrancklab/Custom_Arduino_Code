@@ -166,6 +166,7 @@ void temp_stabilizer()
     digitalWrite(activator1, LOW);
     digitalWrite(activator2, LOW);
     hit_max = true;
+    hit_min = false;
   
 
     Serial.println("Heater Off");
@@ -176,6 +177,7 @@ void temp_stabilizer()
     digitalWrite(activator1, HIGH);
     digitalWrite(activator2, HIGH);
     hit_min = true;
+    hit_max = false;
     
 
     Serial.println("Heater On");
