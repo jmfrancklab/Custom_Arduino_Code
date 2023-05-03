@@ -15,15 +15,11 @@ mytype = dtype([
 ])
 
 result = fromfile(filename, dtype=mytype)
-for i in range(size(result)):
-    print
 
 # Shift millis to start at 0
 result["millistime"] = result["millistime"] - result["millistime"][0]
 
 
-for i in range(size(result)):
-    print(result[i])
 
 
 
@@ -47,13 +43,15 @@ axs[0, 2].set_ylabel("Heater on/off")
 axs[0, 2].set_title("Heater State vs Time")
 axs[0, 2].legend()
 
-axs[1, 0].plot(result["millistime"], result["T_average_of_Al_Block"], ",", label="Average")
-axs[1, 0].plot(result["millistime"], result["T_Water"], ",", label="Water")
-axs[1, 0].plot(result["millistime"], result["temp_baseline"], ",", label="Target")
+axs[1, 0].plot(result["millistime"], result["T_average_of_Al_Block"], "--", label="Average")
+axs[1, 0].plot(result["millistime"], result["T_Water"], "--", label="Water")
+axs[1, 0].plot(result["millistime"], result["temp_baseline"], "--", label="Target")
 axs[1, 0].set_xlabel('Time [ms]')
 axs[1, 0].set_ylabel('Temperature [C]')
 axs[1, 0].set_title('Temp vs. Time (avg)')
 axs[1, 0].legend()
+
+axs[1, 0].set_ylim(bottom=22)
 
 axs[1, 1].plot(result["millistime"], result["pump_speed_setting"], "-", label="Pump Speed")
 axs[1, 1].set_xlabel("Time [ms]")
