@@ -463,7 +463,9 @@ void loop()
     if (place > datalen-1 )
     {
       datadump();
+      delay(25); //Give time to run these two functions they are long
       temp_stabilizer();
+      delay(25);
       place = 0;
       switcher ^= true;
     }
