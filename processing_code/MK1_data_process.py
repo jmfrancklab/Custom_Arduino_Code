@@ -1,6 +1,6 @@
 from pylab import *
 
-filename = "DATAREC.dat"
+filename = "DATAREC_5_3_2023.dat"
 
 mytype = dtype([
     ("millistime", "<u4"), 
@@ -31,7 +31,7 @@ axs[0, 0].set_ylabel("PWO [0-100]")
 axs[0, 0].set_title("Time vs. PWO Position")
 axs[0, 0].legend()
 
-axs[0, 1].plot(result["millistime"], result["Voltage_analog_input"], ".", label="Analog")
+axs[0, 1].plot(result["millistime"], result["Voltage_analog_input"], ".", label="Analog",markersize = 2)
 axs[0, 1].set_xlabel("Time [ms]")
 axs[0, 1].set_ylabel("Analog [0-1024]")
 axs[0, 1].set_title("Analog Integer Reading vs. Time")
@@ -42,16 +42,17 @@ axs[0, 2].set_xlabel("Time [ms]")
 axs[0, 2].set_ylabel("Heater on/off")
 axs[0, 2].set_title("Heater State vs Time")
 axs[0, 2].legend()
-
-axs[1, 0].plot(result["millistime"], result["T_average_of_Al_Block"], "--", label="Average")
-axs[1, 0].plot(result["millistime"], result["T_Water"], "--", label="Water")
-axs[1, 0].plot(result["millistime"], result["temp_baseline"], "--", label="Target")
+size = .7
+axs[1, 0].plot(result["millistime"], result["T_average_of_Al_Block"], ".", label="Average",markersize = size)
+axs[1, 0].plot(result["millistime"], result["T_Water"], ".", label="Water",markersize = size)
+axs[1, 0].plot(result["millistime"], result["temp_baseline"], ".", label="Target", markersize = size)
 axs[1, 0].set_xlabel('Time [ms]')
 axs[1, 0].set_ylabel('Temperature [C]')
 axs[1, 0].set_title('Temp vs. Time (avg)')
 axs[1, 0].legend()
 
 axs[1, 0].set_ylim(bottom=22)
+axs[1,0].set_ylim(top = 50)
 
 axs[1, 1].plot(result["millistime"], result["pump_speed_setting"], "-", label="Pump Speed")
 axs[1, 1].set_xlabel("Time [ms]")
