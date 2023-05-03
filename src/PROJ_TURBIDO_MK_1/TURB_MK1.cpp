@@ -447,6 +447,7 @@ void loop()
     if(switcher){
       
       digi_position = digiwrite(15);
+      delay(25); // Physical function will give delay to fully set in
 
     }else{
       digi_position = digiwrite(0);

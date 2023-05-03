@@ -1,6 +1,6 @@
 from pylab import *
 
-filename = "DATAREC-1.dat"
+filename = "DATAREC.dat"
 
 mytype = dtype([
     ("millistime", "<u4"), 
