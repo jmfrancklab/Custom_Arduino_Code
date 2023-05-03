@@ -245,7 +245,7 @@ void user_choice_interface()
   Serial.println("Type 6 to Start or Stop Live data feed");
   
   Serial.flush(); // To make sure if the user presses a faulty key the program does not fail
-  while (!Serial.available() || millis() - timeout <= 6000) {
+  while (!Serial.available() && millis() - timeout <= 3000) {
 
   }
   int decider = Serial.parseInt();
@@ -392,6 +392,8 @@ void setup()
 void loop()
 {
 
+
+
   if (inter_on)
   {
 
@@ -470,5 +472,7 @@ void loop()
       place = 0;
       switcher ^= true;
     }
+    
   }
+ 
 }
