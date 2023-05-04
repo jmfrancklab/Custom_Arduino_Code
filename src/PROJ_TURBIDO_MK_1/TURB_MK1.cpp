@@ -151,6 +151,7 @@ void datastore_add(){
   buffer[place].millistime = millis();
   buffer[place].Voltage_analog_input = analogRead(SENSING_PIN_OP_AMP);                               // Analog Reading of OD
   buffer[place].digi_pot_wiper_position = digi_position;                                             // Where the digipot is
+  sensors.requestTemperatures(); // Put in the Error of the function
   buffer[place].T_Water = sensors.getTempC(sensorA);                                                 // Temp Values
   buffer[place].T_average_of_Al_Block = (sensors.getTempC(sensorB) + sensors.getTempC(sensorC)) / 2; // Temp value
   buffer[place].pump_speed_setting = push_pump;                                                        // Keeps a record of the pump speed
