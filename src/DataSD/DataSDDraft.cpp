@@ -7,7 +7,7 @@
 //defining a structure
 struct Datastore {
     unsigned int Analog;
-    unsigned long int time
+    unsigned long int time;
 };
 
 // I am going to test the ability to print structure to terminal first
