@@ -259,7 +259,7 @@ void user_choice_interface()
     Serial.println("Please type the pump control: (0-255), Type xxx or xx. for x < 100");
     Serial.println("Make sure pump is on first");
 
-    while (Serial.available() < 3 || Serial.peek() == ".")
+    while (Serial.available() < 3 || Serial.peek() == -1)
     {
       delay(100); // Wait for input
     }
@@ -273,7 +273,7 @@ void user_choice_interface()
 
     Serial.println("Wait for TempSetting");
     Serial.println("Please type temp setting (20 C < T < 50 C ) Type xx.xx ");
-    while (Serial.available() < 5 || Serial.peek() == ".")
+    while (Serial.available() < 5 || Serial.peek() == -1)
     {
       delay(100); // Wait for input
     }
@@ -284,7 +284,7 @@ void user_choice_interface()
     ttar = push_temp;
     t_max = ttar + tolorance; // The tolorances for each constraint
     t_min = ttar - tolorance; // The tolorances for each constraint
-    temp_stabilizer();
+    
     break;
   case 3: // pump power
     Serial.println("Switching Pump State");
