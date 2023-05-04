@@ -10,25 +10,27 @@
 
 // TEMP PINS
 
+// JF comment: it's convention for macros to be uppercase
 #define ONE_WIRE_BUS 3 // The busline for the three temperature sensors
-#define activator1 7   // The Relay pin for Bang Control
-#define activator2 6   // The second relay control switch for Bang Control
+#define ACTIVATOR1 7   // The Relay pin for Bang Control
+#define ACTIVATOR2 6   // The second relay control switch for Bang Control
 
 // OPTICS AND SD
 
-#define sensing_pin_op_amp A0 // The reading for cell count corrolation
-#define slave_select_digi 53  // The slave communicator for the Digipot
-#define Chip_Select_Pin 4     // The ethernet and SD chip select pin
+#define SENSING_PIN_OP_AMP A0 // The reading for cell count corrolation
+#define SLAVE_SELECT_DIGI 53  // The slave communicator for the Digipot
+#define CHIP_SELECT_PIN 4     // The ethernet and SD chip select pin
 #define HIGH_PIN 10           // In order for the arduino sheild to work must be present
 // PUMP CONTROL
 
-#define ENA_MotorPin 5 // Pin for PWM SPEED of PUMP MODULATION
+// JF comment: what is ENA?
+#define ENA_MOTORPIN 5 // Pin for PWM SPEED of PUMP MODULATION
 #define IN1 A4         // Logical Determiner for on and off
 #define IN2 A1         // Logical Determiner for on and off
 
 // Button
 
-#define IRupt 2 // The pin which opens up the menu for user interfacing
+#define IRUPT 2 // The pin which opens up the menu for user interfacing
 
 // DEFINING STRUCURES INSTENCES AND ADDRESSES
 
@@ -135,10 +137,10 @@ int digiwrite(int digi_value)
 {
 
   SPI.beginTransaction(mySetting);      // The transaction settings from the specific Arduino
-  digitalWrite(slave_select_digi, LOW); // Once low the Settings shift to allow writing
+  digitalWrite(SLAVE_SELECT_DIGI, LOW); // Once low the Settings shift to allow writing
   SPI.transfer(0x00);                   // The 8 bit address that is all zeros to prep to write the bit 0-255 for MCP4151
   SPI.transfer(digi_value);
-  digitalWrite(slave_select_digi, HIGH); // Switching recieving bit back to zero
+  digitalWrite(SLAVE_SELECT_DIGI, HIGH); // Switching recieving bit back to zero
   SPI.endTransaction();
   return digi_value; // Ends the transaction for this specific spi device
 }
@@ -146,7 +148,7 @@ int digiwrite(int digi_value)
 void datastore_add(){
 
   buffer[place].millistime = millis();
-  buffer[place].Voltage_analog_input = analogRead(sensing_pin_op_amp);                               // Analog Reading of OD
+  buffer[place].Voltage_analog_input = analogRead(SENSING_PIN_OP_AMP);                               // Analog Reading of OD
   buffer[place].digi_pot_wiper_position = digi_position;                                             // Where the digipot is
   buffer[place].T_Water = sensors.getTempC(sensorA);                                                 // Temp Values
   buffer[place].T_average_of_Al_Block = (sensors.getTempC(sensorB) + sensors.getTempC(sensorC)) / 2; // Temp value
@@ -163,8 +165,8 @@ void temp_stabilizer()
   if ((sensors.getTempC(sensorC)+sensors.getTempC(sensorB))/2 >= t_max && !hit_max)
   {
     passer = 0;
-    digitalWrite(activator1, LOW);
-    digitalWrite(activator2, LOW);
+    digitalWrite(ACTIVATOR1, LOW);
+    digitalWrite(ACTIVATOR2, LOW);
     hit_max = true;
     hit_min = false;
   
@@ -174,8 +176,8 @@ void temp_stabilizer()
   if ((sensors.getTempC(sensorC)+sensors.getTempC(sensorB))/2 <= t_min && !hit_min)
   {
     passer = 1;
-    digitalWrite(activator1, HIGH);
-    digitalWrite(activator2, HIGH);
+    digitalWrite(ACTIVATOR1, HIGH);
+    digitalWrite(ACTIVATOR2, HIGH);
     hit_min = true;
     hit_max = false;
     
@@ -190,12 +192,12 @@ void system_status()
   Serial.println(" Digipot Position is: ");
   Serial.print(digi_position);
   Serial.println("Optic Integer [0-1024]: ");
-  Serial.print(analogRead(sensing_pin_op_amp));
+  Serial.print(analogRead(SENSING_PIN_OP_AMP));
   Serial.println("\n Pump Speed");
-  Serial.print(push_pump);
-  Serial.println("\n Temp Baseline: ");
-  Serial.print(ttar);
-  sensors.requestTemperatures();
+  Serial.print(push_pump);// JF comment: give this variable a better name
+  Serial.println("\n Temp Setting: ");
+  Serial.print(ttar);// JF comment: give this variable a better name
+  sensors.requestTemperatures();// JF comment: why are you using this method here, but not elsewhere??
   Serial.print("Sensor A: ");
   Serial.print(sensors.getTempC(sensorA));
 
@@ -223,11 +225,11 @@ void handleInterrupt()
 void initalize_pump_and_interupt()
 {
 
-  pinMode(IRupt, INPUT_PULLUP);
+  pinMode(IRUPT, INPUT_PULLUP);
   pinMode(IN1, OUTPUT);
   pinMode(IN2, OUTPUT);
-  pinMode(ENA_MotorPin, OUTPUT);
-  attachInterrupt(digitalPinToInterrupt(IRupt), handleInterrupt, FALLING);
+  pinMode(ENA_MOTORPIN, OUTPUT);
+  attachInterrupt(digitalPinToInterrupt(IRUPT), handleInterrupt, FALLING);
 }
 
 void user_choice_interface()
@@ -242,18 +244,18 @@ void user_choice_interface()
   Serial.println("Type 3 for Turning on or off the Pump");
   Serial.println("Type 4 for Pump Direction Switch");
   Serial.println("Type 5 to start or end a recording program ");
-  Serial.println("Type 6 to Start or Stop Live data feed");
+  Serial.println("Type 6 to Start or Stop Live data feed for debugging"); 
   
   Serial.flush(); // To make sure if the user presses a faulty key the program does not fail
   while (!Serial.available() && millis() - timeout <= 3000) {
 
   }
-  int decider = Serial.parseInt();
+  int decider = Serial.parseInt(); // JF comment: what happens if this is not an integer?
 
   switch (decider)
   {
 
-      case 1:
+      case 1: // pump speed
 
           Serial.println("Wait for Pump Setting: ");
           Serial.println("Please type the pump control: (0-255), Type xxx or xx. for x < 100");
@@ -264,13 +266,13 @@ void user_choice_interface()
               delay(100); // Wait for input
           }
           push_pump = Serial.parseInt();
-          analogWrite(ENA_MotorPin, push_pump);
+          analogWrite(ENA_MOTORPIN, push_pump);
           Serial.print("Pump set to analog setting of: ");
           Serial.print(push_pump);
 
 
           break;
-      case 2:
+      case 2: // temp
 
           Serial.println("Wait for TempSetting");
           Serial.println("Please type temp setting (20 C < T < 50 C ) Type xx.xx ");
@@ -287,7 +289,7 @@ void user_choice_interface()
           t_min = ttar - tolorance; // The tolorances for each constraint
           temp_stabilizer();
           break;
-      case 3:
+      case 3: // pump power
           Serial.println("Switching Pump State");
           Pump_State ^= true;
           // Switching the value from its orgional if off then on if on then off
@@ -300,23 +302,23 @@ void user_choice_interface()
           {
               digitalWrite(IN1, HIGH);
               digitalWrite(IN2, LOW);
-              analogWrite(ENA_MotorPin, 10);
+              analogWrite(ENA_MOTORPIN, 10); // JF comment: what is 10 here? duty cycle as percentage? as fraction of 256?
           }
           break;
-      case 4:
+      case 4: // direction
           if (digitalRead(IN1) == 1 && digitalRead(IN2) == 0)
           {
 
               digitalWrite(IN1, LOW);
               digitalWrite(IN2, HIGH);
-              Serial.println("Switch Motor Flow Direction");
+              Serial.println("Motor set to reverse direction");
           }
           else if (digitalRead(IN1) == 0 && digitalRead(IN2) == 1)
           {
 
               digitalWrite(IN1, HIGH);
               digitalWrite(IN2, LOW);
-              Serial.print("Switched Motor Flow Direction");
+              Serial.println("Motor set to forward direction");
           }
           else
           {
@@ -324,13 +326,13 @@ void user_choice_interface()
               Serial.print("Should Turn on Pump First");
           }
           break;
-      case 5:
+      case 5: // data
 
           data_probe = true;
 
           break;
 
-      case 6:
+      case 6: // debug
 
           displaying_serial ^= true;
           break;
@@ -341,9 +343,9 @@ void user_choice_interface()
           break;
   }
 
-  Serial.println("Execution of Order Complete please wait until menu avalible again");
-  delay(1000);
-  Serial.println("\n\n\nMenu avalible again press button to use");
+  Serial.println("Execution of Order Complete please wait until menu available again");
+  delay(1000); // JF comment: what is the point of this?
+  Serial.println("\n\n\nMenu available again press button to use");
 }
 
 void setup()
@@ -352,23 +354,23 @@ void setup()
   // Making pinModes
 
   // Pump and interrupt
-  pinMode(IRupt, INPUT_PULLUP);
+  pinMode(IRUPT, INPUT_PULLUP);
   pinMode(IN1, OUTPUT);
   pinMode(IN2, OUTPUT);
-  pinMode(ENA_MotorPin, OUTPUT);
-  attachInterrupt(digitalPinToInterrupt(IRupt), handleInterrupt, FALLING);
+  pinMode(ENA_MOTORPIN, OUTPUT);
+  attachInterrupt(digitalPinToInterrupt(IRUPT), handleInterrupt, FALLING);
 
   // Relay and Temp
 
-  pinMode(activator1, OUTPUT);
-  pinMode(activator2, OUTPUT);
-  digitalWrite(activator1, LOW);
-  digitalWrite(activator2, LOW);
+  pinMode(ACTIVATOR1, OUTPUT);
+  pinMode(ACTIVATOR2, OUTPUT);
+  digitalWrite(ACTIVATOR1, LOW);
+  digitalWrite(ACTIVATOR2, LOW);
 
   // OD and digipot
 
-  pinMode(slave_select_digi, OUTPUT);
-  pinMode(sensing_pin_op_amp, INPUT);
+  pinMode(SLAVE_SELECT_DIGI, OUTPUT);
+  pinMode(SENSING_PIN_OP_AMP, INPUT);
   pinMode(HIGH_PIN, OUTPUT);
   digitalWrite(HIGH_PIN, OUTPUT);
 
@@ -396,7 +398,7 @@ void loop()
 
   if (inter_on)
   {
-
+    // JF comment: why do this? why not just set user_choice_interface as the callback?
     inter_on = false;
     delay(3000);
     user_choice_interface();
@@ -411,8 +413,8 @@ void loop()
       skip = true;
       data_is_running ^= true;
       ttar = 22;
-      digitalWrite(activator1,LOW);
-      digitalWrite(activator2,LOW);
+      digitalWrite(ACTIVATOR1,LOW);
+      digitalWrite(ACTIVATOR2,LOW);
       SD.end();
       Serial.println("File Growth Run Complete:");
       Serial.println("You may remove SD CARD");
@@ -422,12 +424,12 @@ void loop()
     }
     if (!data_is_running && !skip)
     {
-          if (!SD.begin(Chip_Select_Pin))
+          if (!SD.begin(CHIP_SELECT_PIN))
       {
         Serial.print("SD Fail");
         Serial.println("Reformat the SD card to fix");
       }
-      else if (SD.begin(Chip_Select_Pin))
+      else if (SD.begin(CHIP_SELECT_PIN))
   {
 
     Serial.println("SD Pass");
