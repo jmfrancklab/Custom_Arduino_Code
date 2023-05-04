@@ -36,6 +36,7 @@
 
 // Temp Control
 
+// JF comment: why isn't this done in setup?
 OneWire oneWire(ONE_WIRE_BUS);       // Pass oneWire reference to DallasTemperature library
 DallasTemperature sensors(&oneWire); // Pass oneWire reference to DallasTemperature library
 const uint8_t sensorA[8] = {0x28, 0x26, 0x3B, 0x94, 0x97, 0x0A, 0x03, 0x56};
