@@ -440,15 +440,15 @@ void loop()
   {
     if (switcher)
     {
-      delay(75);
+      delay(150);
       digi_position = digiwrite(15);
-      delay(75); // Physical function will give delay to fully set in
+      delay(150); // Physical function will give delay to fully set in
     }
     else
     {
-      delay(75);
+      delay(150);
       digi_position = digiwrite(0);
-      delay(75); // Three physical function give delay to fully set in 
+      delay(150); // Three physical function give delay to fully set in 
     }
 
     datastore_add();
