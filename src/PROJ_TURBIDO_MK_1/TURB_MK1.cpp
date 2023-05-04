@@ -63,7 +63,8 @@ struct datalog
   unsigned long int microtime;
 };
 
-File MYDATA; // Created an instance of the open file
+File data_fileobj; // for storing file instance -- note that similarly,
+                   // things that are not macros should NOT be all caps
 
 // NOW INTRODUCING VARIABLES WHICH WILL BE WITHIN FUNCITON ARGUEMENTS
 
@@ -113,25 +114,25 @@ void datadump()
 
 {
 
-  MYDATA = SD.open(filename, FILE_WRITE);
-  data_wrote = MYDATA.write((const uint8_t *)buffer, sizeof(buffer)); // Writing to the file
-  MYDATA.seek(EOF);
+  data_fileobj = SD.open(filename, FILE_WRITE);
+  data_wrote = data_fileobj.write((const uint8_t *)buffer, sizeof(buffer)); // Writing to the file
+  data_fileobj.seek(EOF);
   Serial.print("Wrote: ");
   Serial.print(data_wrote); // To check if data actually written
   Serial.print(" much data\n");
   Serial.print("Is data avalible? ");
-  Serial.println(MYDATA.available());
+  Serial.println(data_fileobj.available());
   Serial.print("The name of the file is: ");
-  Serial.println(MYDATA.name());
+  Serial.println(data_fileobj.name());
   Serial.print("Size of Structure: ");
   Serial.print(sizeof(buffer));
   Serial.print("Position of the file is: ");
-  Serial.print(MYDATA.position());
+  Serial.print(data_fileobj.position());
   Serial.print("The file Exist? ");
   Serial.print(SD.exists(filename));
   Serial.print("The size of the file is now: ");
-  Serial.println(MYDATA.size());
-  MYDATA.close();
+  Serial.println(data_fileobj.size());
+  data_fileobj.close();
 }
 
 int digiwrite(int digi_value)
@@ -192,6 +193,10 @@ void system_status()
 {
 
   Serial.println(" Digipot Position is: ");
+  // JF comment: a **major** comment -- rather than doing these things
+  //             independently, feed the datastore as an arguement to
+  //             system_status, and have it print out the info
+  //             This function **should not be interacting with the devices**
   Serial.print(digi_position);
   Serial.println("Optic Integer [0-1024]: ");
   Serial.print(analogRead(SENSING_PIN_OP_AMP));
@@ -466,6 +471,9 @@ void loop()
     if (displaying_serial)
     {
       system_status();
+      // JF comment: here -- modify system_status to take buffer[place]
+      //             as an argument, and have it just use the attribute of
+      //             the structure to do its thing
     }
     if (place > datalen-1 )
     {
