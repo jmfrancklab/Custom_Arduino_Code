@@ -24,6 +24,7 @@
 // PUMP CONTROL
 
 // JF comment: what is ENA?
+
 #define ENA_MOTORPIN 5 // Pin for PWM SPEED of PUMP MODULATION
 #define IN1 A4         // Logical Determiner for on and off
 #define IN2 A1         // Logical Determiner for on and off
@@ -119,19 +120,19 @@ void datadump()
   data_fileobj.seek(EOF);
   Serial.print("Wrote: ");
   Serial.print(data_wrote); // To check if data actually written
-  Serial.print(" much data\n");
-  Serial.print("Is data avalible? ");
-  Serial.println(data_fileobj.available());
-  Serial.print("The name of the file is: ");
-  Serial.println(data_fileobj.name());
-  Serial.print("Size of Structure: ");
+  Serial.print(" much data");
+  Serial.println("Is data avalible? ");
+  Serial.print(data_fileobj.available());
+  Serial.println("The name of the file is: ");
+  Serial.print(data_fileobj.name());
+  Serial.println("Size of Structure: ");
   Serial.print(sizeof(buffer));
-  Serial.print("Position of the file is: ");
+  Serial.println("Position of the file is: ");
   Serial.print(data_fileobj.position());
-  Serial.print("The file Exist? ");
+  Serial.println("The file Exist? ");
   Serial.print(SD.exists(filename));
-  Serial.print("The size of the file is now: ");
-  Serial.println(data_fileobj.size());
+  Serial.println("The size of the file is now: ");
+  Serial.print(data_fileobj.size());
   data_fileobj.close();
 }
 
@@ -147,43 +148,41 @@ int digiwrite(int digi_value)
   return digi_value; // Ends the transaction for this specific spi device
 }
 
-void datastore_add(){
+void datastore_add()
+{
 
   buffer[place].millistime = millis();
   buffer[place].Voltage_analog_input = analogRead(SENSING_PIN_OP_AMP);                               // Analog Reading of OD
   buffer[place].digi_pot_wiper_position = digi_position;                                             // Where the digipot is
-  sensors.requestTemperatures(); // Put in the Error of the function
+  sensors.requestTemperatures();                                                                     // Put requests the temperature
   buffer[place].T_Water = sensors.getTempC(sensorA);                                                 // Temp Values
   buffer[place].T_average_of_Al_Block = (sensors.getTempC(sensorB) + sensors.getTempC(sensorC)) / 2; // Temp value
-  buffer[place].pump_speed_setting = push_pump;                                                        // Keeps a record of the pump speed
-  buffer[place].temp_baseline = ttar;                                                            // To allow comparision of the baseline temp target and the actual temperature
+  buffer[place].pump_speed_setting = push_pump;                                                      // Keeps a record of the pump speed
+  buffer[place].temp_baseline = ttar;                                                                // To allow comparision of the baseline temp target and the actual temperature
   buffer[place].heater_state = passer;
   buffer[place].microtime = micros();
-  
 }
 
 void temp_stabilizer()
 {
-  
-  if ((sensors.getTempC(sensorC)+sensors.getTempC(sensorB))/2 >= t_max && !hit_max)
+
+  if (buffer[place].T_average_of_Al_Block >= t_max && !hit_max)
   {
     passer = 0;
     digitalWrite(ACTIVATOR1, LOW);
     digitalWrite(ACTIVATOR2, LOW);
     hit_max = true;
     hit_min = false;
-  
 
     Serial.println("Heater Off");
   }
-  if ((sensors.getTempC(sensorC)+sensors.getTempC(sensorB))/2 <= t_min && !hit_min)
+  if (buffer[place].T_average_of_Al_Block <= t_min && !hit_min)
   {
     passer = 1;
     digitalWrite(ACTIVATOR1, HIGH);
     digitalWrite(ACTIVATOR2, HIGH);
     hit_min = true;
     hit_max = false;
-    
 
     Serial.println("Heater On");
   }
@@ -193,35 +192,27 @@ void system_status()
 {
 
   Serial.println(" Digipot Position is: ");
-  // JF comment: a **major** comment -- rather than doing these things
-  //             independently, feed the datastore as an arguement to
-  //             system_status, and have it print out the info
-  //             This function **should not be interacting with the devices**
-  Serial.print(digi_position);
+
+  Serial.print(buffer[place].digi_pot_wiper_position);
   Serial.println("Optic Integer [0-1024]: ");
-  Serial.print(analogRead(SENSING_PIN_OP_AMP));
-  Serial.println("\n Pump Speed");
-  Serial.print(push_pump);// JF comment: give this variable a better name
-  Serial.println("\n Temp Setting: ");
-  Serial.print(ttar);// JF comment: give this variable a better name
-  sensors.requestTemperatures();// JF comment: why are you using this method here, but not elsewhere??
+  Serial.print(buffer[place].Voltage_analog_input);
+  Serial.println("Pump Speed");
+  Serial.print(buffer[place].pump_speed_setting); // JF comment: give this variable a better name
+  Serial.println("Temp Setting: ");
+  Serial.print(buffer[place].temp_baseline); // JF comment: give this variable a better name
   Serial.print("Sensor A: ");
-  Serial.print(sensors.getTempC(sensorA));
+  Serial.print(buffer[place].T_Water);
 
   Serial.print(" [C] ,");
-  Serial.print("Sensor B: ");
-  Serial.print(sensors.getTempC(sensorB));
-
-  Serial.print(" [C] ,");
-  Serial.print(" Sensor C: ");
-  Serial.print(sensors.getTempC(sensorC));
-  Serial.println(" [C] ");
-
+  Serial.println("Sensor B, C Average: ");
+  Serial.print(buffer[place].T_average_of_Al_Block);
   Serial.println("At time:  ");
-  Serial.print(millis() / 60000);
+  Serial.print(buffer[place].millistime / 60000);
   Serial.print(" Minutes ");
-  Serial.print("Structure position: ");
+  Serial.println("Structure position: ");
   Serial.print(place);
+  Serial.println("Heater state: ");
+  Serial.print(buffer[place].heater_state);
 }
 
 void handleInterrupt()
@@ -251,107 +242,105 @@ void user_choice_interface()
   Serial.println("Type 3 for Turning on or off the Pump");
   Serial.println("Type 4 for Pump Direction Switch");
   Serial.println("Type 5 to start or end a recording program ");
-  Serial.println("Type 6 to Start or Stop Live data feed for debugging"); 
-  
-  Serial.flush(); // To make sure if the user presses a faulty key the program does not fail
-  while (!Serial.available() && millis() - timeout <= 3000) {
+  Serial.println("Type 6 to Start or Stop Live data feed for debugging");
 
+  Serial.flush(); // To make sure if the user presses a faulty key the program does not fail
+  while (!Serial.available() && millis() - timeout <= 3000)
+  {
   }
   int decider = Serial.parseInt(); // JF comment: what happens if this is not an integer?
 
   switch (decider)
   {
 
-      case 1: // pump speed
+  case 1: // pump speed
 
-          Serial.println("Wait for Pump Setting: ");
-          Serial.println("Please type the pump control: (0-255), Type xxx or xx. for x < 100");
-          Serial.println("Make sure pump is on first");
+    Serial.println("Wait for Pump Setting: ");
+    Serial.println("Please type the pump control: (0-255), Type xxx or xx. for x < 100");
+    Serial.println("Make sure pump is on first");
 
-          while (Serial.available() < 3 || Serial.peek() == ".")
-          {
-              delay(100); // Wait for input
-          }
-          push_pump = Serial.parseInt();
-          analogWrite(ENA_MOTORPIN, push_pump);
-          Serial.print("Pump set to analog setting of: ");
-          Serial.print(push_pump);
+    while (Serial.available() < 3 || Serial.peek() == ".")
+    {
+      delay(100); // Wait for input
+    }
+    push_pump = Serial.parseInt();
+    analogWrite(ENA_MOTORPIN, push_pump);
+    Serial.print("Pump set to analog setting of: ");
+    Serial.print(push_pump);
 
+    break;
+  case 2: // temp
 
-          break;
-      case 2: // temp
+    Serial.println("Wait for TempSetting");
+    Serial.println("Please type temp setting (20 C < T < 50 C ) Type xx.xx ");
+    while (Serial.available() < 5 || Serial.peek() == ".")
+    {
+      delay(100); // Wait for input
+    }
+    push_temp = Serial.parseFloat();
+    Serial.print("Set temp baseline to: ");
+    Serial.print(push_temp);
+    Serial.print(" C");
+    ttar = push_temp;
+    t_max = ttar + tolorance; // The tolorances for each constraint
+    t_min = ttar - tolorance; // The tolorances for each constraint
+    temp_stabilizer();
+    break;
+  case 3: // pump power
+    Serial.println("Switching Pump State");
+    Pump_State ^= true;
+    // Switching the value from its orgional if off then on if on then off
+    if (Pump_State == true)
+    {
+      digitalWrite(IN1, LOW);
+      digitalWrite(IN2, LOW);
+    }
+    else if (Pump_State == false)
+    {
+      digitalWrite(IN1, HIGH);
+      digitalWrite(IN2, LOW);
+      analogWrite(ENA_MOTORPIN, 10); // JF comment: what is 10 here? duty cycle as percentage? as fraction of 256?
+    }
+    break;
+  case 4: // direction
+    if (digitalRead(IN1) == 1 && digitalRead(IN2) == 0)
+    {
 
-          Serial.println("Wait for TempSetting");
-          Serial.println("Please type temp setting (20 C < T < 50 C ) Type xx.xx ");
-          while (Serial.available() < 5 || Serial.peek() == ".")
-          {
-              delay(100); // Wait for input
-          }
-          push_temp = Serial.parseFloat();
-          Serial.print("Set temp baseline to: ");
-          Serial.print(push_temp);
-          Serial.print(" C");
-          ttar = push_temp;
-          t_max = ttar + tolorance; // The tolorances for each constraint
-          t_min = ttar - tolorance; // The tolorances for each constraint
-          temp_stabilizer();
-          break;
-      case 3: // pump power
-          Serial.println("Switching Pump State");
-          Pump_State ^= true;
-          // Switching the value from its orgional if off then on if on then off
-          if (Pump_State == true)
-          {
-              digitalWrite(IN1, LOW);
-              digitalWrite(IN2, LOW);
-          }
-          else if (Pump_State == false)
-          {
-              digitalWrite(IN1, HIGH);
-              digitalWrite(IN2, LOW);
-              analogWrite(ENA_MOTORPIN, 10); // JF comment: what is 10 here? duty cycle as percentage? as fraction of 256?
-          }
-          break;
-      case 4: // direction
-          if (digitalRead(IN1) == 1 && digitalRead(IN2) == 0)
-          {
+      digitalWrite(IN1, LOW);
+      digitalWrite(IN2, HIGH);
+      Serial.println("Motor set to reverse direction");
+    }
+    else if (digitalRead(IN1) == 0 && digitalRead(IN2) == 1)
+    {
 
-              digitalWrite(IN1, LOW);
-              digitalWrite(IN2, HIGH);
-              Serial.println("Motor set to reverse direction");
-          }
-          else if (digitalRead(IN1) == 0 && digitalRead(IN2) == 1)
-          {
+      digitalWrite(IN1, HIGH);
+      digitalWrite(IN2, LOW);
+      Serial.println("Motor set to forward direction");
+    }
+    else
+    {
 
-              digitalWrite(IN1, HIGH);
-              digitalWrite(IN2, LOW);
-              Serial.println("Motor set to forward direction");
-          }
-          else
-          {
+      Serial.print("Should Turn on Pump First");
+    }
+    break;
+  case 5: // data
 
-              Serial.print("Should Turn on Pump First");
-          }
-          break;
-      case 5: // data
+    data_probe = true;
 
-          data_probe = true;
+    break;
 
-          break;
+  case 6: // debug
 
-      case 6: // debug
+    displaying_serial ^= true;
+    break;
 
-          displaying_serial ^= true;
-          break;
+  default:
+    Serial.print("Rerun the Interrupt Again Error Occured");
 
-      default:
-          Serial.print("Rerun the Interrupt Again Error Occured");
-
-          break;
+    break;
   }
 
   Serial.println("Execution of Order Complete please wait until menu available again");
-  delay(1000); // JF comment: what is the point of this?
   Serial.println("\n\n\nMenu available again press button to use");
 }
 
@@ -387,7 +376,6 @@ void setup()
   sensors.begin();
   SPI.begin();
 
-
   // Temp Sensor Check
 
   Serial.print("Locating devices...");
@@ -400,8 +388,6 @@ void setup()
 
 void loop()
 {
-
-
 
   if (inter_on)
   {
@@ -420,27 +406,24 @@ void loop()
       skip = true;
       data_is_running ^= true;
       ttar = 22;
-      digitalWrite(ACTIVATOR1,LOW);
-      digitalWrite(ACTIVATOR2,LOW);
+      digitalWrite(ACTIVATOR1, LOW);
+      digitalWrite(ACTIVATOR2, LOW);
       SD.end();
       Serial.println("File Growth Run Complete:");
       Serial.println("You may remove SD CARD");
-
-
-      
     }
     if (!data_is_running && !skip)
     {
-          if (!SD.begin(CHIP_SELECT_PIN))
+      if (!SD.begin(CHIP_SELECT_PIN))
       {
         Serial.print("SD Fail");
         Serial.println("Reformat the SD card to fix");
       }
       else if (SD.begin(CHIP_SELECT_PIN))
-  {
+      {
 
-    Serial.println("SD Pass");
-  }
+        Serial.println("SD Pass");
+      }
       Serial.println("Beginning Data Log Do Not Remove SD Card");
       data_is_running ^= true;
       skip = true;
@@ -455,15 +438,17 @@ void loop()
 
   if (data_is_running)
   {
-    if(switcher){
-      
+    if (switcher)
+    {
+
       digi_position = digiwrite(15);
       delay(25); // Physical function will give delay to fully set in
-
-    }else{
+    }
+    else
+    {
       digi_position = digiwrite(0);
     }
-    
+
     datastore_add();
     place++;
     delay(250);
@@ -471,20 +456,13 @@ void loop()
     if (displaying_serial)
     {
       system_status();
-      // JF comment: here -- modify system_status to take buffer[place]
-      //             as an argument, and have it just use the attribute of
-      //             the structure to do its thing
     }
-    if (place > datalen-1 )
+    if (place > datalen - 1)
     {
       datadump();
-      delay(25); //Give time to run these two functions they are long
       temp_stabilizer();
-      delay(25);
       place = 0;
       switcher ^= true;
     }
-    
   }
- 
 }
