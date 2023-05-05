@@ -120,7 +120,7 @@ void datadump()
 
   
 }
-void digiwrite(int digi_value)
+void digiwrite(unsigned char digi_value)
 {
 
   SPI.beginTransaction(mySetting);      // The transaction settings from the specific Arduino
@@ -135,7 +135,7 @@ void serline(int j)
 
   Serial.print("At Digi Pot STEP");
   Serial.print(j);
-  digiwrite(j); // Write a new digiwrite resister value
+  digiwrite((unsigned int) j); // Write a new digiwrite resister value
   Serial.print(": With a the sensor reading: ");
   Serial.print(analogRead(A0)); // Taking the average of the opamp function rounded to integeger which is not what much accuracy taken away
   Serial.print("\n");
