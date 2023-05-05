@@ -1,6 +1,6 @@
 from pylab import *
 
-filename = "DATAREC.dat"
+filename = "DATAREC_5-5-2023.dat"
 
 mytype = dtype([
     ("millistime", "<u4"), 
@@ -15,7 +15,7 @@ mytype = dtype([
 ])
 
 result = fromfile(filename, dtype=mytype)
-
+result = result[0: 1500]
 # Shift millis to start at 0
 result["millistime"] = result["millistime"] - result["millistime"][0]
 
