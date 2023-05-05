@@ -19,9 +19,9 @@ lib_deps =
 // Setting integers to for data keepers
 int num_average = 10;        // The number of counts before the average is taken
 int sensing_pin_op_amp = A0; // Where the analog integer will be housed
-int slave_select_digi = 9;   // Slave selected pin for the arduino (can change depending on board)
+int slave_select_digi = 53;   // Slave selected pin for the arduino (can change depending on board)
 int serial_speed = 9600;
-int j = 100;   // Restarting the variable resistor program
+int j;   // Restarting the variable resistor program
 int place = 0; // The place is set to zero or one of the 20 slots within the structre since again, 0 is the first structure storage space
 
 // Now setting datastore structure and SD Mechanics
@@ -153,7 +153,7 @@ void setup()
 void loop()
 {
   digiwrite(100);
-  j = 100; //Initally set to 100 at the beginning but once the for loop is finished... the j must be resetting since j controls the digipot wiper setting with 100 sensitive starting point
+  j = 255; //Initally set to 100 at the beginning but once the for loop is finished... the j must be resetting since j controls the digipot wiper setting with 100 sensitive starting point
   for (j; j >= 0; j--)
   {
     serline(j);              // Writing a line of code to the serial which gives the current state of the detecting value along with time
