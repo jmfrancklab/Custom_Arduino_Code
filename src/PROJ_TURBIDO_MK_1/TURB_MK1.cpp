@@ -98,7 +98,7 @@ bool switcher = true;
 // Temp mechanics
 int device_count; // The amout of devices that are counted of temp prboes berfore program start
 float ttar = 22;  // Target temp 22 as defult
-float tolorance = 0.25;
+float tolorance = 0.05;
 float t_max = ttar + tolorance; // The tolorances for each constraint
 float t_min = ttar - tolorance; // The tolorances for each constraint
 bool heater_on = false;         // Heater starts of not on
@@ -440,6 +440,7 @@ void loop()
   }
   if (data_is_running)
   {
+    noInterrupts();
     /*if (switcher)
     {
       delay(150);
@@ -452,15 +453,19 @@ void loop()
       digi_position = digiwrite(0);
       delay(150); // Three physical function give delay to fully set in 
     }*/
-
+    delay(100);
+    digi_position = digiwrite(j);
+    delay(100);
+    j--;
     datastore_add();
     temp_stabilizer();
-    digi_position = digiwrite(j);
-    j--;
     place++;
     delay(250);
-    if(digi_position <-1){
+    if(digi_position <=0){
       j = 129;
+      inter_on = true;
+
+      
     }
 
     if (displaying_serial)
