@@ -113,10 +113,10 @@ int digi_value;    // The value passed to the digiwrite function
 
 // Digipot Modulation Mechanics;
 
-int high_range = 0;
-int low_range = 0;
-int modulation_low = 400;
-int modulation_high = 1024;
+int high_range = 60;
+int low_range = 60;
+int modulation_low = 300;
+int modulation_high = 1000;
 
 
 // Adding indepentent action functions
@@ -358,11 +358,12 @@ void user_choice_interface()
 void modulate()
 {
 
-    if (buffer[place].Voltage_analog_input >= modulation_high)
+    if (buffer[place].Voltage_analog_input >= modulation_high && switcher)
     {
         high_range ++;
+        
     }
-    if (buffer[place].Voltage_analog_input <= modulation_low)
+    if (buffer[place].Voltage_analog_input <= modulation_low && !switcher)
     {
 
         low_range --;
