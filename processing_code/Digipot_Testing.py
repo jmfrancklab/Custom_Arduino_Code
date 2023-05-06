@@ -1,8 +1,8 @@
 from pylab import *
 
-filename = "Saftey_Resistence_Run.DAT"
-filename1 = "Eli_Circ_2k.DAT"
-filename2 = "20OHM_Saftey.DAT"
+filename = "Saftey_Re.DAT"
+
+
 mytype = dtype([
     ("millistime", "<u4"),
     ("Voltage_analog_input", "<f4"),
@@ -16,7 +16,7 @@ mytype = dtype([
     ("DigiV","<u4"),
 ])
 
-result = fromfile(filename2, dtype=mytype)
+result = fromfile(filename3, dtype=mytype)
 
 # Shift millis to start at 0
 result["millistime"] = result["millistime"] - result["millistime"][0]
