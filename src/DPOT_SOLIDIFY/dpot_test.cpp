@@ -35,6 +35,7 @@ struct datastore // Now setting datastore structure
   unsigned long int microtime;  // Time from the smaller micros function
   float Voltage_analog_input;   // The analog input single from the OD sensor
   unsigned long int digi_pot_wiper_position;  // The digipot wiping position
+  unsigned long int digiVoltageDirect;
 };
 
 File dataFile; // Created an instance of the open file
@@ -91,6 +92,7 @@ void datastore_add(int place, int j)
   dbuff[place].microtime = micros();
   dbuff[place].Voltage_analog_input = analogRead(sensing_pin_op_amp);
   dbuff[place].digi_pot_wiper_position = j; // Since the place i
+  dbuff[place].digiVoltageDirect = analogRead(A2);
 }
 void datadump()
 {
@@ -147,13 +149,14 @@ void setup()
   SPI.begin(); // Initializes the SPI bus by setting SCK, MOSI, and SS to outputs, pulling SCK and MOSI low, and SS high.
   pinMode(slave_select_digi, OUTPUT);
   pinMode(sensing_pin_op_amp, INPUT);
+  pinMode(A2,INPUT);
   checkSD();
   delay(50);
 }
 void loop()
 {
   digiwrite(100);
-  j = 255; //Initally set to 100 at the beginning but once the for loop is finished... the j must be resetting since j controls the digipot wiper setting with 100 sensitive starting point
+  j = 129; //Initally set to 100 at the beginning but once the for loop is finished... the j must be resetting since j controls the digipot wiper setting with 100 sensitive starting point
   for (j; j >= 0; j--)
   {
     serline(j);              // Writing a line of code to the serial which gives the current state of the detecting value along with time
