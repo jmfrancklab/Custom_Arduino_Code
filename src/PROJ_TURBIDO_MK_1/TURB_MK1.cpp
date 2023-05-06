@@ -97,7 +97,7 @@ bool data_probe = false;
 bool switcher = true;
 // Temp mechanics
 int device_count; // The amout of devices that are counted of temp prboes berfore program start
-float ttar = 22;  // Target temp 22 as defult
+float ttar = 40;  // Target temp 22 as defult
 float tolorance = 0.05;
 float t_max = ttar + tolorance; // The tolorances for each constraint
 float t_min = ttar - tolorance; // The tolorances for each constraint
