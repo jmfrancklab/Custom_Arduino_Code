@@ -12,13 +12,19 @@ mytype = dtype([
 
 result = fromfile(filename, dtype=mytype)
 
-print(result)
-plot(result["digi_pot_wiper_position"], (result["Voltage_analog_input"])*5/1024, ".", label="Hooked up LED")
-plot(result["digi_pot_wiper_position"],(result["digiVoltageDirect"])*5/1024,".",label = "V out From R_AB")
-xlabel("Resistence Step 0 -255")
-ylabel("Voltage")
-title("Analog Integer Reading vs. Step Position of (MCP4131 502E/P )")
-legend()
+fig, axs = subplots(1, 2, figsize=(18, 8))
+
+axs[0, 0].plot(result["millistime"], result["digi_pot_wiper_position"], "-", label="PWO")
+axs[0, 0].set_xlabel("Time [ms]")
+axs[0, 0].set_ylabel("PWO [0-100]")
+axs[0, 0].set_title("Time vs. PWO Position")
+axs[0, 0].legend()
+
+axs[0, 1].plot(result["millistime"], result["Voltage_analog_input"], ".", label="Analog",markersize = 2)
+axs[0, 1].set_xlabel("Time [ms]")
+axs[0, 1].set_ylabel("Analog [0-1024]")
+axs[0, 1].set_title("Analog Integer Reading vs. Time")
+axs[0, 1].legend()
 
 
 

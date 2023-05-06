@@ -12,6 +12,7 @@ mytype = dtype([
     ("temp_baseline", "<f4"),
     ("heater_state", "<u4"),
     ("microtime","<u4"),
+    ("DigiV","<u4"),
 ])
 
 result = fromfile(filename, dtype=mytype)

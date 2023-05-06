@@ -28,6 +28,7 @@
 #define ENA_MOTORPIN 5 // Pin for PWM SPEED of PUMP MODULATION
 #define IN1 A4         // Logical Determiner for on and off
 #define IN2 A1         // Logical Determiner for on and off
+#define DVOLT A2 // The voltage digipot Sensor
 
 // Button
 
@@ -62,6 +63,7 @@ struct datalog
   float temp_baseline;
   unsigned long int heater_state;
   unsigned long int microtime;
+  unsigned long int DigiV;
 };
 
 File data_fileobj; // for storing file instance -- note that similarly,
@@ -161,6 +163,7 @@ void datastore_add()
   buffer[place].temp_baseline = ttar;                                                                // To allow comparision of the baseline temp target and the actual temperature
   buffer[place].heater_state = passer;
   buffer[place].microtime = micros();
+  buffer[place].DigiV = analogRead(DVOLT);
 }
 
 void temp_stabilizer()
@@ -364,7 +367,7 @@ void setup()
   digitalWrite(ACTIVATOR2, LOW);
 
   // OD and digipot
-
+  pinMode(DVOLT,INPUT);
   pinMode(SLAVE_SELECT_DIGI, OUTPUT);
   pinMode(SENSING_PIN_OP_AMP, INPUT);
   pinMode(HIGH_PIN, OUTPUT);
