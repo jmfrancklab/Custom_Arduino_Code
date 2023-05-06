@@ -1,7 +1,10 @@
 from pylab import *
 
 filename = "GoodData.DAT"
-
+filename1 = "20_OHM_Saftey.DAT"
+filename2 = "1Data.DAT"
+filename3 = "2k_No_Saftey.DAT"
+filename4 = "Eli_Circ_2k.DAT"
 
 mytype = dtype([
     ("millistime", "<u4"),
@@ -16,7 +19,7 @@ mytype = dtype([
     ("DigiV","<u4"),
 ])
 
-result = fromfile(filename, dtype=mytype)
+result = fromfile(filename4, dtype=mytype)
 
 # Shift millis to start at 0
 result["millistime"] = result["millistime"] - result["millistime"][0]
