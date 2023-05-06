@@ -105,7 +105,7 @@ bool heater_on = false;         // Heater starts of not on
 bool hit_max = false;           // Has not entered max of min yet
 bool hit_min = false;           // Used to determine the on off cycle of the heater
 unsigned long int passer;       // Variable to pass the value of wether the heater is on or off
-
+  int j = 129;
 // OD and DIGIPOT MECHANICS
 
 int digi_position; // The position of the digipot
@@ -438,9 +438,9 @@ void loop()
       }
     }
   }
-  /*if (data_is_running)
+  if (data_is_running)
   {
-    if (switcher)
+    /*if (switcher)
     {
       delay(150);
       digi_position = digiwrite(15);
