@@ -387,6 +387,7 @@ void setup()
   Serial.print(device_count, DEC);
   Serial.println(" devices.");
   Serial.println("");
+  int j = 129;
 }
 
 void loop()
@@ -399,7 +400,6 @@ void loop()
     delay(3000);
     user_choice_interface();
   }
-
   if (data_probe)
   {
     data_probe = false;
@@ -438,8 +438,7 @@ void loop()
       }
     }
   }
-
-  if (data_is_running)
+  /*if (data_is_running)
   {
     if (switcher)
     {
@@ -452,12 +451,17 @@ void loop()
       delay(150);
       digi_position = digiwrite(0);
       delay(150); // Three physical function give delay to fully set in 
-    }
+    }*/
 
     datastore_add();
     temp_stabilizer();
+    digi_position = digiwrite(j);
+    j--;
     place++;
     delay(250);
+    if(digi_position <-1){
+      j = 129;
+    }
 
     if (displaying_serial)
     {
