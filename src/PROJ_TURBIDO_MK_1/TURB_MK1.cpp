@@ -125,7 +125,7 @@ void modulate()
 
     if (!switcher)
     {
-        for (int i; i < 11; i++)
+        for (int i; i < 5; i++)
         {
             if (buffer[place].Voltage_analog_input < modulation_high_range_low)
             {
@@ -144,7 +144,7 @@ void modulate()
         }
         if (switcher)
         {
-            for (int i; i < 11; i++)
+            for (int i; i < 5; i++)
             {
                 if (buffer[place].Voltage_analog_input < modulation_low_range_low)
                 {
