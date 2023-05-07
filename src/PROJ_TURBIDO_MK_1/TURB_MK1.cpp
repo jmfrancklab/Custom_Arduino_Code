@@ -175,7 +175,7 @@ void datadump()
     data_fileobj.close();
 }
 
-int digiwrite(int digi_value)
+unsigned long int digiwrite(unsigned long int digi_value)
 {
 
     SPI.beginTransaction(mySetting);      // The transaction settings from the specific Arduino

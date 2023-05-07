@@ -1,6 +1,6 @@
 from pylab import *
 
-filename = "DATAREC_5-5-2023.dat"
+filename = "DATAREC.DAT"
 
 mytype = dtype([
     ("millistime", "<u4"), 
@@ -26,9 +26,9 @@ result["millistime"] = result["millistime"] - result["millistime"][0]
 
 fig, axs = subplots(2, 3, figsize=(18, 8))
 
-axs[0, 0].plot(result["millistime"], result["digi_pot_wiper_position"], "-", label="PWO")
+axs[0, 0].plot(result["millistime"], result["digi_pot_wiper_position"], "-")
 axs[0, 0].set_xlabel("Time [ms]")
-axs[0, 0].set_ylabel("PWO [0-100]")
+axs[0, 0].set_ylabel("Resistence STEP [0-129]")
 axs[0, 0].set_title("Time vs. PWO Position")
 axs[0, 0].legend()
 
