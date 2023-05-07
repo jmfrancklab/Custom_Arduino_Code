@@ -114,17 +114,18 @@ int digi_value;    // The value passed to the digiwrite function
 // Digipot Modulation Mechanics;
 
 int high_range_digi= 0;
-int low_range_digi = 129;
-int modulation_low_range_low = 180;
-int modulation_low_range_high = 300;
-int modulation_high_range_high = 900;
-int modulation_high_range_low = 700;
+int low_range_digi = 80;
+int modulation_low_range_low = 200;
+int modulation_low_range_high = 400;
+int modulation_high_range_high = 975;
+int modulation_high_range_low = 750;
 
 void modulate()
 {
 
-    if (switcher)
+    if (!switcher)
     {
+        for(int i; i < 11; i++){
         if (buffer[place].Voltage_analog_input < modulation_high_range_low)
         {
             high_range_digi--;
@@ -134,9 +135,9 @@ void modulate()
             high_range_digi++;
         }
     }
-    if (!switcher)
+    if (switcher)
     {
-
+    for(int i; i < 11; i++){
         if (buffer[place].Voltage_analog_input < modulation_low_range_low)
         {
             low_range_digi--;
@@ -480,13 +481,13 @@ void loop()
         if (switcher)
         {
             delay(150);
-            digi_position = digiwrite(high_range_digi);
+            digi_position = digiwrite(low_range_digi);
             delay(150); // Physical function will give delay to fully set in
         }
         else
         {
             delay(150);
-            digi_position = digiwrite(low_range_digi);
+            digi_position = digiwrite(high_range_digi);
             delay(150); // Three physical function give delay to fully set in
         }
 
