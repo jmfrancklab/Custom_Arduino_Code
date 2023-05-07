@@ -15,10 +15,14 @@ mytype = dtype([
     ("DigiV","<u4"),
 ])
 
+
 result = fromfile(filename, dtype=mytype)
 result = result[0: 1500]
 # Shift millis to start at 0
 result["millistime"] = result["millistime"] - result["millistime"][0]
+
+for i in range(size(result)):
+    print(result[i])
 
 
 
@@ -26,7 +30,7 @@ result["millistime"] = result["millistime"] - result["millistime"][0]
 
 fig, axs = subplots(2, 3, figsize=(18, 8))
 
-axs[0, 0].plot(result["millistime"], result["digi_pot_wiper_position"], "-")
+axs[0, 0].plot(result["millistime"], result["digi_pot_wiper_position"], ".")
 axs[0, 0].set_xlabel("Time [ms]")
 axs[0, 0].set_ylabel("Resistence STEP [0-129]")
 axs[0, 0].set_title("Time vs. PWO Position")

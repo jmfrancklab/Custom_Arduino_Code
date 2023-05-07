@@ -117,8 +117,8 @@ int high_range_digi = 0;
 int low_range_digi = 80;
 int modulation_low_range_low = 200;
 int modulation_low_range_high = 400;
-int modulation_high_range_high = 975;
-int modulation_high_range_low = 750;
+int modulation_high_range_high = 900;
+int modulation_high_range_low = 700;
 
 void modulate()
 {
@@ -130,10 +130,16 @@ void modulate()
             if (buffer[place].Voltage_analog_input < modulation_high_range_low)
             {
                 high_range_digi--;
+                    delay(10);
+                    digi_position = digiwrite(high_range_digi);
+                    delay(10);
             }
             if (buffer[place].Voltage_analog_input > modulation_high_range_high)
             {
                 high_range_digi++;
+                    delay(10);
+                    digi_position = digiwrite(high_range_digi);
+                    delay(10);
             }
         }
         if (switcher)
@@ -143,10 +149,16 @@ void modulate()
                 if (buffer[place].Voltage_analog_input < modulation_low_range_low)
                 {
                     low_range_digi--;
+                    delay(10);
+                    digi_position = digiwrite(low_range_digi);
+                    delay(10);
                 }
                 if (buffer[place].Voltage_analog_input > modulation_low_range_high)
                 {
                     low_range_digi++;
+                    delay(10);
+                    digi_position = digiwrite(low_range_digi);
+                    delay(10);
                 }
             }
         }
@@ -480,24 +492,11 @@ void modulate()
             if (data_is_running)
             {
 
-                if (switcher)
-                {
-                    delay(150);
-                    digi_position = digiwrite(low_range_digi);
-                    delay(150); // Physical function will give delay to fully set in
-                }
-                else
-                {
-                    delay(150);
-                    digi_position = digiwrite(high_range_digi);
-                    delay(150); // Three physical function give delay to fully set in
-                }
-
-                datastore_add();
-                temp_stabilizer();
                 modulate();
+                temp_stabilizer();
+                datastore_add();
                 place++;
-                delay(250);
+                delay(100);
 
                 if (displaying_serial)
                 {
