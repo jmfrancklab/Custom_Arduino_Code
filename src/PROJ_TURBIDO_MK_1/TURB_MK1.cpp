@@ -113,11 +113,40 @@ int digi_value;    // The value passed to the digiwrite function
 
 // Digipot Modulation Mechanics;
 
-int high_range = 60;
-int low_range = 60;
-int modulation_low = 300;
-int modulation_high = 1000;
+int high_range_digi= 0;
+int low_range_digi = 129;
+int modulation_low_range_low = 180;
+int modulation_low_range_high = 300;
+int modulation_high_range_high = 900;
+int modulation_high_range_low = 700;
 
+void modulate()
+{
+
+    if (switcher)
+    {
+        if (buffer[place].Voltage_analog_input < modulation_high_range_low)
+        {
+            high_range_digi--;
+        }
+        if (buffer[place].Voltage_analog_input > modulation_high_range_high)
+        {
+            high_range_digi++;
+        }
+    }
+    if (!switcher)
+    {
+
+        if (buffer[place].Voltage_analog_input < modulation_low_range_low)
+        {
+            low_range_digi--;
+        }
+        if (buffer[place].Voltage_analog_input > modulation_low_range_high)
+        {
+            low_range_digi++;
+        }
+    }
+}
 
 // Adding indepentent action functions
 
@@ -355,22 +384,6 @@ void user_choice_interface()
     Serial.println("\n\n\nMenu available again press button to use");
 }
 
-void modulate()
-{
-
-    if (buffer[place].Voltage_analog_input >= modulation_high && switcher)
-    {
-        high_range ++;
-        
-    }
-    if (buffer[place].Voltage_analog_input <= modulation_low && !switcher)
-    {
-
-        low_range --;
-    }
-
-}
-
 void setup()
 {
 
@@ -411,8 +424,6 @@ void setup()
     Serial.print(device_count, DEC);
     Serial.println(" devices.");
     Serial.println("");
-
-
 }
 
 void loop()
@@ -469,13 +480,13 @@ void loop()
         if (switcher)
         {
             delay(150);
-            digi_position = digiwrite(high_range);
+            digi_position = digiwrite(high_range_digi);
             delay(150); // Physical function will give delay to fully set in
         }
         else
         {
             delay(150);
-            digi_position = digiwrite(low_range);
+            digi_position = digiwrite(low_range_digi);
             delay(150); // Three physical function give delay to fully set in
         }
 
