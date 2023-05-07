@@ -114,7 +114,7 @@ int digi_value;    // The value passed to the digiwrite function
 // Digipot Modulation Mechanics;
 
 int high_range_digi= 0;
-int low_range_digi = 129;
+int low_range_digi = 80;
 int modulation_low_range_low = 180;
 int modulation_low_range_high = 300;
 int modulation_high_range_high = 900;
