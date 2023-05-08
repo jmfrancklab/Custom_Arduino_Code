@@ -115,9 +115,9 @@ int digi_value;    // The value passed to the digiwrite function
 
 int high_range_digi= 10;
 int low_range_digi = 70;
-int modulation_low_range_low = 200;
-int modulation_low_range_high = 500;
-int modulation_high_range_high = 800;
+int modulation_low_range_low = 275;
+int modulation_low_range_high = 475;
+int modulation_high_range_high = 900;
 int modulation_high_range_low = 500;
 
 void modulate()
