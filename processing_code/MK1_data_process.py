@@ -1,6 +1,6 @@
 from pylab import *
 
-filename = "New_Calibration_Range.DAT"
+filename = "DATAREC.DAT"
 
 mytype = dtype([
     ("millistime", "<u4"), 
@@ -26,13 +26,13 @@ result["millistime"] = result["millistime"] - result["millistime"][0]
 
 fig, axs = subplots(2, 3, figsize=(18, 8))
 
-axs[0, 0].plot(result["millistime"], result["digi_pot_wiper_position"], ".",markersize = 2)
+axs[0, 0].plot(result["millistime"], result["digi_pot_wiper_position"], ".",markersize = .5)
 axs[0, 0].set_xlabel("Time [ms]")
 axs[0, 0].set_ylabel("Resistence STEP [0-129]")
 axs[0, 0].set_title("Time vs. PWO Position")
 axs[0, 0].legend()
 
-axs[0, 1].plot(result["millistime"], result["Voltage_analog_input"], ".", label="Analog",markersize = 2)
+axs[0, 1].plot(result["millistime"], result["Voltage_analog_input"], ".", label="Analog",markersize = .5)
 axs[0, 1].set_xlabel("Time [ms]")
 axs[0, 1].set_ylabel("Analog [0-1024]")
 axs[0, 1].set_title("Analog Integer Reading vs. Time")
