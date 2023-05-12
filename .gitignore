@@ -4,3 +4,9 @@
 .vscode/launch.json
 .vscode/ipch
 read_write_example/TEST.DAT
+tags
+processing_code/Cell_Growth.DAT
+processing_code/Cell_Growth.DAT.bak
+processing_code/DATAREC-1.DAT
+src/SD_binary/test.dat
+src/PROJ_TURBIDO_MK_1/TURB_MK1.cpp.orig
