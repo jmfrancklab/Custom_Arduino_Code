@@ -21,8 +21,7 @@ result = fromfile(filename, dtype=mytype)
 # Shift millis to start at 0
 result["millistime"] = result["millistime"] - result["millistime"][0]
 
-for i in range(size(result)):
-    print(result[i])
+
 
 
 
