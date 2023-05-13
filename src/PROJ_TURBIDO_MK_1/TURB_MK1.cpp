@@ -124,11 +124,9 @@ int modulation_high_range_low = 700;
 int high_range_digi= 10;
 int low_range_digi = 70;
 int modulation_low_range_low = 275;
-int modulation_low_range_high = 450;
-int modulation_high_range_high = 975;
-int modulation_high_range_low = 750;
->>>>>>> 9baba7ebfd8e3ba01e612d87e6a8d47687634f7a
-
+int modulation_low_range_high = 475;
+int modulation_high_range_high = 900;
+int modulation_high_range_low = 500;
 
 void modulate()
 {
@@ -249,7 +247,7 @@ void modulate()
         void system_status()
         {
 
-            Serial.println(" Digipot Position is: ");
+    Serial.print(" Digipot Position is: ");
 
             Serial.print(buffer[place].digi_pot_wiper_position);
             Serial.println("Optic Integer [0-1024]: ");
