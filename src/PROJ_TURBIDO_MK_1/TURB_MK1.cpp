@@ -19,8 +19,9 @@
 
 #define SENSING_PIN_OP_AMP A0 // The reading for cell count corrolation
 #define SLAVE_SELECT_DIGI 53  // The slave communicator for the Digipot
-#define CHIP_SELECT_PIN 4     // The ethernet and SD chip select pin
-#define HIGH_PIN 10           // In order for the arduino sheild to work must be present
+
+#define CHIP_SELECT_PIN 4 // The ethernet and SD chip select pin
+#define HIGH_PIN 10       // In order for the arduino sheild to work must be present
 // PUMP CONTROL
 
 // JF comment: what is ENA?
@@ -89,7 +90,6 @@ float push_temp;        // Value to set the temperature setting of the pump
 
 // Interrupt mechanics
 
-
 int decider;                  // Helps with deciding which side program to activate
 bool data_is_running = false; // A conditional switch to true after a command
 bool displaying_serial = false;
@@ -134,15 +134,16 @@ bool button_toggle_state = false;
 void button_check()
 {
 
-    if (digitalRead(Button) == HIGH) // is the button currently down?
+    if (digitalRead(Button) == LOW) // is the button currently down?
         last_button_press = millis();
     {
-        if (digitalRead(Button) == HIGH && millis() - last_button_press > 1000) // b/c we don't want the following if we're continuously holding down the button
+        if (digitalRead(Button) == LOW && millis() - last_button_press > 1000) // b/c we don't want the following if we're continuously holding down the button
         {
             button_toggle_state = true; // flip state of buttonToggleState
         }
     }
 }
+
 void modulate()
 {
 
@@ -408,6 +409,9 @@ void setup()
 {
 
     // Making pinModes
+    // Button pinmode
+
+    pinMode(Button, INPUT_PULLUP);
 
     // Pump and interrupt
 
@@ -447,8 +451,8 @@ void setup()
 
 void loop()
 {
-button_check();
-   
+    button_check();
+
     if (button_toggle_state)
     {
         // JF comment: why do this? why not just set user_choice_interface as the callback?
