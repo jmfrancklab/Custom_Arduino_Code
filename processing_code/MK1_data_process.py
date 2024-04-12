@@ -1,8 +1,10 @@
-from pylab import *
+
+
+
 
 filename = "DATAREC.DAT"
 
-mytype = dtype([
+mytype = type([
     ("millistime", "<u4"), 
     ("Voltage_analog_input", "<f4"),  
     ("digi_pot_wiper_position", "<u4"),    
