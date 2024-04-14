@@ -19,7 +19,7 @@ mytype = dtype([
     ("DigiV","<u4"),
 ])
 
-result = fromfile(filename4, dtype=mytype)
+result = fromfile(filename1, dtype=mytype)
 
 # Shift millis to start at 0
 result["millistime"] = result["millistime"] - result["millistime"][0]

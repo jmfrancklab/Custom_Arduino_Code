@@ -1,9 +1,10 @@
 from pylab import *
 
 
-filename = "DATAREC_5_3_2023.DAT"
 
-mytype = type([
+filename = "BL21_Growth_Fail.DAT"
+
+mytype = dtype([
     ("millistime", "<u4"), 
     ("Voltage_analog_input", "<f4"),  
     ("digi_pot_wiper_position", "<u4"),    
@@ -18,6 +19,7 @@ mytype = type([
 
 
 result = fromfile(filename, dtype=mytype)
+print(result)
 
 # Shift millis to start at 0
 result["millistime"] = result["millistime"] - result["millistime"][0]
