@@ -21,6 +21,8 @@ mytype = dtype([
 result = fromfile(filename, dtype=mytype)
 print(result)
 
+
+
 # Shift millis to start at 0
 result["millistime"] = result["millistime"] - result["millistime"][0]
 
